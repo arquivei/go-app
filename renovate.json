@@ -1,0 +1,13 @@
+{
+  "extends": ["config:base"],
+  "postUpdateOptions": ["gomodTidy", "gomodUpdateImportPaths"],
+  "packageRules": [
+    {
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-minor-patch",
+      "matchPackagePatterns": ["*"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "schedule": ["before 8am on Monday"]
+    }
+  ]
+}
