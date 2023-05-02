@@ -1,7 +1,7 @@
-// This example shows how panics are captured and gracefuly printed.
+// This example shows how panics are captured and gracefully printed.
 //
 // To run this example
-// go run -ldflags="-X main.version=v0.0.1" ./examples/panic/ -app-log-human -app-log-level=trace
+// go run ./examples/panic/ -app-log-human -app-log-level=trace
 package main
 
 import (
