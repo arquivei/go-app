@@ -8,7 +8,7 @@
 // Run this example and try both scenarios. Let it finishes by itself or kill it with ctrl+c.
 //
 // To run this code:
-// go run -ldflags="-X main.version=v0.0.1" ./app/v2/examples/shutdown-handlers/ -app-log-human -app-log-level=trace
+// go run ./examples/shutdown-handlers/ -app-log-human -app-log-level=trace
 package main
 
 import (
@@ -20,12 +20,10 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type config struct {
-	app.Config
-}
-
 var (
-	cfg     config
+	cfg struct {
+		app.Config
+	}
 	version = "development"
 )
 

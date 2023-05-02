@@ -1,0 +1,140 @@
+# Yet another app package
+
+Automating application bootstrapping
+and best practices (according to us)
+
+Rodrigo J. Fonseca
+Software Engineer, Arquivei
+rodrigo.fonseca@arquivei.com.br
+https://linktr.ee/rodrigo.fonseca
+
+## Context
+
+At Arquivei our go applications usually:
+
+- Deploy on Kubernetes (k8s):
+  - Binary packaged as a docker image
+  - Configuration is passed by `configmap`/environment
+- [Grafana](https://grafana.com/) for monitoring and alerts
+- [Loki](https://grafana.com/oss/loki/) for logs
+  - Logs must be structured in JSON format
+
+## The go-app package
+
+An opinionated package that implements some of our practices so that it's easy and fast to replicate.
+
+- Configuration from CLI or environment
+- [Kubernetes probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/)
+- [Graceful shutdown](https://blog.risingstack.com/graceful-shutdown-node-js-kubernetes/)
+- Metrics
+- Debugging
+- Structured logging
+- Sane defaults
+
+## Minimal dependencies
+
+.code ../go.mod /^require/,/^\)/
+
+- `omeid/uconfig`: Bind flag and environment to struct
+- `prometheus/client_golang`: Metrics
+- `rs/zerolog`: Structured log in JSON format
+- `stretchr/testify`: Better unit testing asserts
+
+## Config
+
+Configuration is defined as a `struct`
+
+.code ../examples/servefiles/main.go /^var/,/^\)/
+
+## Automatic configuration binding
+
+```shell
+go run ./examples/servefiles/ -h
+
+Supported Fields:
+FIELD                             FLAG                               ENV                               DEFAULT
+-----                             -----                              -----                             -------
+App.Log.Level                     -app-log-level                     APP_LOG_LEVEL                     info
+App.Log.Human                     -app-log-human                     APP_LOG_HUMAN
+App.AdminServer.Enabled           -app-adminserver-enabled           APP_ADMINSERVER_ENABLED           true
+App.AdminServer.Port              -app-adminserver-port              APP_ADMINSERVER_PORT              9000
+App.AdminServer.With.DebugURLs    -app-adminserver-with-debugurls    APP_ADMINSERVER_WITH_DEBUGURLS    true
+App.AdminServer.With.Metrics      -app-adminserver-with-metrics      APP_ADMINSERVER_WITH_METRICS      true
+App.AdminServer.With.Probes       -app-adminserver-with-probes       APP_ADMINSERVER_WITH_PROBES       true
+App.Shutdown.GracePeriod          -app-shutdown-graceperiod          APP_SHUTDOWN_GRACEPERIOD          3s
+App.Shutdown.Timeout              -app-shutdown-timeout              APP_SHUTDOWN_TIMEOUT              5s
+HTTP.Port                         -http-port                         HTTP_PORT                         8000
+Dir                               -dir                               DIR
+```
+
+## Bootstraping
+
+.code ../examples/servefiles/main.go /^func main/,/^}/
+
+## The Admin server
+
+.code ../app.go /^func \(app \*App\) startAdminServer/,/}/
+
+- Can be enabled/disabled
+- Uses a separate HTTP server (Defaults to **9000**)
+- Exposes:
+  - Metrics
+  - Kubernetes probes
+  - Profilling (pprof)
+  - Dumps (memory, goroutines, etc)
+
+## The Admin server - Metrics and probes
+
+.code ../app.go /mux := http.NewServeMux/,/&app.Ready/
+
+- Metrics and probes are always enabled
+- Default Prometheus metrics handler
+- Compatible k8s readiness and healthiness probes
+  - healthiness: restart unhealthy pods
+  - readiness: Adds/removes from Load Balancer
+
+## The Admin server - Probe example
+
+.code ../examples/probes/main.go /exampleProbe/,/}\(\)/
+
+Logs from: `go run ./examples/probes/main.go -app-log-human`
+
+```
+Probe says: readiness:OK http_status=200
+Probe says: readiness:example_probe http_status=500
+```
+
+## The Admin server - Profilling and debugging
+
+.code ../app.go /if c.App.AdminServer.With.DebugURLs/,/}/
+
+- Optional
+- pprof
+- Dumps
+- Just curl the URLs:
+
+```sh
+curl http://pod:9000/debug/pprof > pod.pprof
+```
+
+## Graceful Shutdown
+
+1. App waits for **SIGINT** or **SIGTERM**
+2. Changes **Readiness** probe to return error
+   - Kubernetes removes app from LB (no more new requests)
+3. App waits **Grace Period**
+   - Gives time to LB stops sending requests
+   - Current requests to finish
+4. App executes all **Shutdown Handlers** in order
+   - Thread safe, shutdown occurs only once
+5. App closes
+
+## Graceful Shutdown - Example
+
+.code ../examples/shutdown-handlers/main.go /app\.RegisterShutdownHandler\(/,/}\)/
+
+- High priority is execute first
+- Policy indicates what to do in case of error
+  - Just warn that some error occur
+  - Abort the shutdown chain
+  - Panics

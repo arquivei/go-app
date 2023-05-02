@@ -2,10 +2,8 @@
 // handler to serve all files on a given directory.
 //
 // To run this program in the commandline you could use:
-//   go run ./app/v2/examples/servefiles/ -log-human -log-level=debug
-// You can also use environment variables:
-//   APP_LOG_HUMAN=true APP_LOG_LEVEL=trace go run -ldflags="-X main.version=v1.0.0" ./app/v2/examples/servefiles/ -dir=/tmp/
-
+//
+//	go run ./examples/servefiles/ -app-log-human -app-log-level=trace
 package main
 
 import (
@@ -17,8 +15,18 @@ import (
 )
 
 var (
-	cfg     config
-	version = "v0.0.1-development"
+	version = "v0.0.0-dev"
+	cfg     struct {
+		// App is the app specific configuration
+		app.Config
+
+		// Programs can have any configuration the want.
+
+		HTTP struct {
+			Port string `default:"8000"`
+		}
+		Dir string `default:"."`
+	}
 )
 
 func main() {
