@@ -97,7 +97,7 @@ func (app *App) startAdminServer(c Config) {
 	}
 
 	server := http.Server{
-		Addr:              ":" + c.App.AdminServer.Port,
+		Addr:              c.App.AdminServer.Addr,
 		Handler:           mux,
 		ReadHeaderTimeout: 60 * time.Second,
 	}

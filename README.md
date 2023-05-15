@@ -45,7 +45,7 @@ FIELD                             FLAG                               ENV        
 App.Log.Level                     -app-log-level                     APP_LOG_LEVEL                     info
 App.Log.Human                     -app-log-human                     APP_LOG_HUMAN
 App.AdminServer.Enabled           -app-adminserver-enabled           APP_ADMINSERVER_ENABLED           true
-App.AdminServer.Port              -app-adminserver-port              APP_ADMINSERVER_PORT              9000
+App.AdminServer.Addr              -app-adminserver-addr              APP_ADMINSERVER_ADDR              localhost:9000
 App.AdminServer.With.DebugURLs    -app-adminserver-with-debugurls    APP_ADMINSERVER_WITH_DEBUGURLS    true
 App.AdminServer.With.Metrics      -app-adminserver-with-metrics      APP_ADMINSERVER_WITH_METRICS      true
 App.AdminServer.With.Probes       -app-adminserver-with-probes       APP_ADMINSERVER_WITH_PROBES       true
