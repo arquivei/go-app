@@ -22,6 +22,7 @@ var (
 func main() {
 	defer app.Recover()
 	app.Bootstrap(version, &cfg)
+
 	app.RunAndWait(func(ctx context.Context) error {
 		<-ctx.Done()
 		return ctx.Err()

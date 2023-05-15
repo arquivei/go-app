@@ -41,7 +41,7 @@ func main() {
 	}()
 
 	app.RunAndWait(func(ctx context.Context) error {
-		readinessURL := "http://127.0.0.1:" + cfg.App.AdminServer.Port + "/ready"
+		readinessURL := "http://" + cfg.App.AdminServer.Addr + "/ready"
 		for ctx.Err() == nil {
 			time.Sleep(time.Second)
 

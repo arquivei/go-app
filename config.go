@@ -19,7 +19,7 @@ type Config struct {
 			// Enabled sets the admin server
 			Enabled bool `default:"true"`
 			// DefaultAdminPort is the default port the app will bind the admin HTTP interface.
-			Port string `default:"9000"`
+			Addr string `default:"localhost:9000"`
 			With struct {
 				// DebugURLs sets the debug URLs in the admin server. To disable them, set to false.
 				DebugURLs bool `default:"true"`

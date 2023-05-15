@@ -23,7 +23,7 @@ var (
 		// Programs can have any configuration the want.
 
 		HTTP struct {
-			Port string `default:"8000"`
+			Addr string `default:"localhost:8000"`
 		}
 		Dir string `default:"."`
 	}
@@ -48,14 +48,14 @@ func main() {
 	app.RunAndWait(func(_ context.Context) error {
 		log.Info().
 			Str("dir", cfg.Dir).
-			Str("port", cfg.HTTP.Port).
+			Str("port", cfg.HTTP.Addr).
 			Msg("Serving directory.")
 		return httpServer.ListenAndServe()
 	})
 }
 
 func newHTTPServer() *http.Server {
-	httpServer := &http.Server{Addr: ":" + cfg.HTTP.Port, Handler: http.FileServer(http.Dir(cfg.Dir))}
+	httpServer := &http.Server{Addr: cfg.HTTP.Addr, Handler: http.FileServer(http.Dir(cfg.Dir))}
 
 	// You can register the shutdown handlers at any order, but do it before starting the app
 	app.RegisterShutdownHandler(
