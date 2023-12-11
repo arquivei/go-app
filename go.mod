@@ -3,7 +3,7 @@ module github.com/arquivei/go-app
 go 1.20
 
 require (
-	github.com/omeid/uconfig v1.2.0
+	github.com/omeid/uconfig v1.2.1
 	github.com/prometheus/client_golang v1.17.0
 	github.com/rs/zerolog v1.31.0
 	github.com/stretchr/testify v1.8.4
