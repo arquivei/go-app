@@ -1,14 +1,15 @@
 package app
 
 import (
+	"os"
 	"time"
 
 	"github.com/arquivei/go-app/logger"
 
-	"github.com/omeid/uconfig"
-	"github.com/omeid/uconfig/plugins/defaults"
-	"github.com/omeid/uconfig/plugins/env"
-	"github.com/omeid/uconfig/plugins/flag"
+	"github.com/arquivei/go-app/internal/thirdparty/uconfig"
+	"github.com/arquivei/go-app/internal/thirdparty/uconfig/plugins/defaults"
+	"github.com/arquivei/go-app/internal/thirdparty/uconfig/plugins/env"
+	"github.com/arquivei/go-app/internal/thirdparty/uconfig/plugins/flag"
 	"github.com/rs/zerolog/log"
 )
 
@@ -37,6 +38,9 @@ type Config struct {
 			// DefaultShutdownTimeout is the default value for the timeout during shutdown.
 			Timeout time.Duration `default:"5s"`
 		}
+		Config struct {
+			Output string
+		}
 	}
 }
 
@@ -53,5 +57,14 @@ func SetupConfig(config any) {
 	if err != nil {
 		c.Usage()
 		log.Fatal().Err(err).Msg("[app] Failed to setup config!")
+	}
+
+	appConfig, ok := config.(AppConfig)
+	if !ok {
+		return
+	}
+	if format := appConfig.GetAppConfig().App.Config.Output; format != "" {
+		c.FormattedUsage(format)
+		os.Exit(0)
 	}
 }

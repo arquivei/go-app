@@ -1,9 +1,10 @@
 module github.com/arquivei/go-app
 
-go 1.20
+go 1.22
+
+toolchain go1.22.1
 
 require (
-	github.com/omeid/uconfig v1.2.1
 	github.com/prometheus/client_golang v1.18.0
 	github.com/rs/zerolog v1.32.0
 	github.com/stretchr/testify v1.8.4

@@ -53,6 +53,21 @@ App.Shutdown.GracePeriod          -app-shutdown-graceperiod          APP_SHUTDOW
 App.Shutdown.Timeout              -app-shutdown-timeout              APP_SHUTDOWN_TIMEOUT              5s
 ```
 
+There is a special option to print out the default configuration in `env` or `yaml` format: `go run . -app-config-output=env`.
+
+``` text
+APP_LOG_LEVEL=info
+APP_LOG_HUMAN=
+APP_ADMINSERVER_ENABLED=true
+APP_ADMINSERVER_ADDR=localhost:9000
+APP_ADMINSERVER_WITH_DEBUGURLS=true
+APP_ADMINSERVER_WITH_METRICS=true
+APP_ADMINSERVER_WITH_PROBES=true
+APP_SHUTDOWN_GRACEPERIOD=3s
+APP_SHUTDOWN_TIMEOUT=5s
+APP_CONFIG_OUTPUT=
+```
+
 Version can be overwritten in compile time using `-ldflags`:
 
 ```sh
@@ -65,7 +80,6 @@ Use the [present](https://pkg.go.dev/golang.org/x/tools/present) tool to render 
 
 ## Minimal dependencies
 
-- `omeid/uconfig`: Bind flag and environment to struct
 - `prometheus/client_golang`: Metrics
 - `rs/zerolog`: Structured log in JSON format
 - `stretchr/testify`: Better unit testing asserts
