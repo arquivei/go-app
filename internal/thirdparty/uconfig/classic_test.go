@@ -21,7 +21,6 @@ func TestMain(m *testing.M) {
 }
 
 func TestClassicBasic(t *testing.T) {
-
 	expect := f.Config{
 		Anon: f.Anon{
 			Version: "from-flags",
@@ -64,8 +63,7 @@ func TestClassicBasic(t *testing.T) {
 }
 
 func TestClassicWithSecret(t *testing.T) {
-
-	//Config is part of text fixtures.
+	// Config is part of text fixtures.
 	type Creds struct {
 		APIKey   string `secret:""`
 		APIToken string `secret:"API_TOKEN"`
@@ -104,7 +102,6 @@ func TestClassicWithSecret(t *testing.T) {
 	value := Config{}
 
 	SecretProvider := func(name string) (string, error) {
-
 		// known secrets.
 		if name == "API_TOKEN" || name == "RETHINK_PASSWORD" || name == "CREDS_APIKEY" {
 			return "top secret token", nil
@@ -126,7 +123,6 @@ func TestClassicWithSecret(t *testing.T) {
 }
 
 func TestClassicBadPlugin(t *testing.T) {
-
 	var badPlugin BadPlugin
 
 	config := f.Config{}
@@ -140,5 +136,4 @@ func TestClassicBadPlugin(t *testing.T) {
 	if err.Error() != "Unsupported plugins. Expecting a Walker or Visitor" {
 		t.Errorf("Expected unsupported plugin error, got: %v", err)
 	}
-
 }

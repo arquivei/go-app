@@ -24,7 +24,6 @@ var UsageOutput io.Writer = os.Stdout
 // Usage prints out the current config fields, flags, env vars
 // and any other source and setting.
 func (c *config) Usage() {
-
 	setUsageMeta(c.fields)
 	headers := getHeaders(c.fields)
 
@@ -43,7 +42,6 @@ func (c *config) Usage() {
 	fmt.Fprintln(w, strings.Join(dashes, "\t"))
 
 	for _, f := range c.fields {
-
 		values := make([]string, len(headers))
 		values[0] = f.Name()
 		for i, header := range headers[1:] {
@@ -64,7 +62,6 @@ func (c *config) Usage() {
 }
 
 func setUsageMeta(fs flat.Fields) {
-
 	for _, f := range fs {
 		usage, ok := f.Tag(usageTag)
 		if !ok {
@@ -72,7 +69,6 @@ func setUsageMeta(fs flat.Fields) {
 		}
 
 		f.Meta()[usageTag] = usage
-
 	}
 }
 
@@ -110,7 +106,6 @@ func getHeaders(fs flat.Fields) []string {
 	}
 
 	sort.SliceStable(tags, func(i, j int) bool {
-
 		iw := weight(tags, i)
 		jw := weight(tags, j)
 

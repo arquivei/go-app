@@ -35,7 +35,6 @@ func makeSecretName(name string) string {
 }
 
 func (v *secret) Visit(f flat.Fields) error {
-
 	v.fields = f
 
 	for _, f := range v.fields {
@@ -51,14 +50,12 @@ func (v *secret) Visit(f flat.Fields) error {
 		}
 
 		f.Meta()[tag] = name
-
 	}
 
 	return nil
 }
 
 func (v *secret) Parse() error {
-
 	for _, f := range v.fields {
 		name, ok := f.Meta()[tag]
 

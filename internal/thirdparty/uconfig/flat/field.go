@@ -46,7 +46,6 @@ func (f *field) IsZero() bool {
 var textUnmarshalerType = reflect.TypeOf(new(encoding.TextUnmarshaler)).Elem()
 
 func (f *field) Set(value string) error {
-
 	t := f.field.Type()
 
 	if t.Implements(textUnmarshalerType) {
@@ -88,7 +87,6 @@ func (f *field) Set(value string) error {
 }
 
 func (f *field) setUnmarshale(value []byte) error {
-
 	if f.field.IsNil() {
 		f.field.Set(reflect.New(f.field.Type().Elem()))
 	}
@@ -143,7 +141,6 @@ func (f *field) setFloat(value string) error {
 }
 
 func (f *field) setSlice(value string) error {
-
 	t := f.field.Type()
 	setSliceElem := setSliceElem(t.Elem())
 
@@ -167,9 +164,7 @@ func (f *field) setSlice(value string) error {
 }
 
 func setSliceElem(elem reflect.Type) func(reflect.Value, string) error {
-
 	switch elem.Kind() {
-
 	case reflect.String:
 		return setSliceElemString
 

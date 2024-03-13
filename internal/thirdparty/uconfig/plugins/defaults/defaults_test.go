@@ -17,7 +17,6 @@ type fDefaults struct {
 }
 
 func TestDefaultTag(t *testing.T) {
-
 	expect := fDefaults{
 		Address: "https://blah.bleh",
 		Bases:   []string{"list", "blah"},

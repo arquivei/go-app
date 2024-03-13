@@ -9,7 +9,6 @@ import (
 )
 
 func TestField(t *testing.T) {
-
 	type Config struct {
 		First  string `default:"first" test:"test-tag"`
 		Second error

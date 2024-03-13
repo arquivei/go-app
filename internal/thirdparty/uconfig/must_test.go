@@ -12,7 +12,6 @@ import (
 )
 
 func TestMust(t *testing.T) {
-
 	defer func() {
 		if r := recover(); r != nil {
 			t.Errorf("Must should not panic, but did: %v", r)
@@ -21,11 +20,9 @@ func TestMust(t *testing.T) {
 
 	value := f.Config{}
 	uconfig.Must(&value)
-
 }
 
 func TestMustPanic(t *testing.T) {
-
 	defer func() {
 		r := recover()
 
@@ -56,7 +53,6 @@ func TestMustPanic(t *testing.T) {
 }
 
 func TestMustPanicNew(t *testing.T) {
-
 	defer func() {
 		r := recover()
 

@@ -12,7 +12,6 @@ import (
 )
 
 func TestFiles(t *testing.T) {
-
 	expect := f.Config{
 		Anon: f.Anon{
 			Version: "0.2",

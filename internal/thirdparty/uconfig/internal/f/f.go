@@ -51,7 +51,7 @@ func (l *TextUnmarshalerStringSlice) UnmarshalText(value []byte) error {
 // ensure the interfae is implemented properly.
 var _ encoding.TextUnmarshaler = &TextUnmarshalerStringSlice{}
 
-//Types is part of text fixtures.
+
 type Types struct {
 	String   string
 	Bool     bool

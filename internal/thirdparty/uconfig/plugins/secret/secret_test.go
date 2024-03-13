@@ -24,7 +24,6 @@ type fSecrets struct {
 }
 
 func TestSecret(t *testing.T) {
-
 	expect := fSecrets{
 		Password:   "password",
 		Alt:        "altPassword",
@@ -42,7 +41,6 @@ func TestSecret(t *testing.T) {
 	}
 
 	source := func(name string) (string, error) {
-
 		secret, ok := secrets[name]
 		if !ok {
 			return "", fmt.Errorf("couldn't find secret for %s", name)
@@ -66,9 +64,7 @@ func TestSecret(t *testing.T) {
 }
 
 func TestSecretErr(t *testing.T) {
-
 	source := func(name string) (string, error) {
-
 		return "", fmt.Errorf("No value found for: %s", name)
 	}
 
@@ -90,11 +86,9 @@ func TestSecretErr(t *testing.T) {
 	if err.Error() != expect {
 		t.Fatalf("Expected: %s\nGot: %s", expect, err)
 	}
-
 }
 
 func TestSecretSetErr(t *testing.T) {
-
 	source := func(name string) (string, error) {
 		return "not a number", nil
 	}
@@ -120,5 +114,4 @@ func TestSecretSetErr(t *testing.T) {
 	if err.Error() != expect {
 		t.Fatalf("Expected: %s\nGot: %s", expect, err)
 	}
-
 }

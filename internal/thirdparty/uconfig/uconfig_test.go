@@ -17,7 +17,6 @@ type BadPlugin interface {
 }
 
 func TestBadPlug(t *testing.T) {
-
 	var badPlugin BadPlugin
 
 	config := f.Config{}
@@ -42,7 +41,6 @@ func (fp FailingPluginWalker) Walk(interface{}) error {
 }
 
 func TestFailingPlugWalker(t *testing.T) {
-
 	var failingPluginWalker FailingPluginWalker
 
 	config := f.Config{}
@@ -67,7 +65,6 @@ func (fp FailingPluginVisitor) Visit(flat.Fields) error {
 }
 
 func TestFailingPlugVisitor(t *testing.T) {
-
 	var failingPluginVisitor FailingPluginVisitor
 
 	config := f.Config{}

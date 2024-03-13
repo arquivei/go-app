@@ -31,7 +31,6 @@ type Field interface {
 // sub-struct fields are prefixed with the struct key (not type) followed by a dot,
 // this is repeated for each nested level.
 func View(s interface{}) (Fields, error) {
-
 	rs, err := unwrap(s)
 
 	if err != nil {
@@ -42,19 +41,16 @@ func View(s interface{}) (Fields, error) {
 }
 
 func walkStruct(prefix string, rs reflect.Value) ([]Field, error) {
-
 	prefix = strings.Title(prefix)
 
 	fields := []Field{}
 
 	ts := rs.Type()
 	for i := 0; i < rs.NumField(); i++ {
-
 		fv := rs.Field(i)
 		ft := ts.Field(i)
 
 		switch fv.Kind() {
-
 		case reflect.Struct:
 			structPrefix := prefix
 			if !ft.Anonymous {

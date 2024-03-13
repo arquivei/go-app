@@ -21,7 +21,6 @@ type Files []struct {
 func (f Files) Plugins() []plugins.Plugin {
 	ps := make([]plugins.Plugin, 0, len(f))
 	for _, f := range f {
-
 		fp := New(
 			f.Path,
 			f.Unmarshal,
@@ -46,7 +45,6 @@ func NewReader(src io.Reader, unmarshal Unmarshal) plugins.Plugin {
 		src:       src,
 		unmarshal: unmarshal,
 	}
-
 }
 
 // Config describes the options required for a file.
@@ -57,7 +55,6 @@ type Config struct {
 
 // New returns an EnvSet.
 func New(path string, unmarshal Unmarshal, config Config) plugins.Plugin {
-
 	plug := &walker{
 		filepath:  path,
 		unmarshal: unmarshal,
@@ -97,7 +94,6 @@ func (v *walker) Walk(conf interface{}) error {
 }
 
 func (v *walker) Parse() error {
-
 	if v.err != nil {
 		return v.err
 	}

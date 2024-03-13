@@ -11,7 +11,6 @@ import (
 )
 
 func TestEnvBasic(t *testing.T) {
-
 	envs := map[string]string{
 		"GOHARD":               "T",
 		"VERSION":              "0.2",
@@ -68,7 +67,6 @@ type fEnv struct {
 }
 
 func TestEnvTag(t *testing.T) {
-
 	envs := map[string]string{
 		"MY_HOST_NAME": "https://blah.bleh",
 	}

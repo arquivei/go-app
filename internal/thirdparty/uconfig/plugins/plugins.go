@@ -40,7 +40,6 @@ var ErrUsage = errors.New("uconfig: usage request")
 // RegisterTag allows providers to ensure their tag is unique.
 // they must call this function from an init.
 func RegisterTag(name string) {
-
 	if pkg, exists := tags[name]; exists {
 		log.Panicf("tag %s already registered by %s", name, pkg)
 	}

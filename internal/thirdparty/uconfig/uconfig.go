@@ -41,7 +41,6 @@ func New(conf interface{}, ps ...plugins.Plugin) (Config, error) {
 	}
 
 	for _, plug := range ps {
-
 		err := c.addPlugin(plug)
 		if err != nil {
 			return c, err
@@ -59,7 +58,6 @@ type config struct {
 
 func (c *config) addPlugin(plug plugins.Plugin) error {
 	switch plug := plug.(type) {
-
 	case plugins.Visitor:
 		err := plug.Visit(c.fields)
 		if err != nil {
@@ -82,7 +80,6 @@ func (c *config) addPlugin(plug plugins.Plugin) error {
 
 func (c *config) Parse() error {
 	for _, p := range c.plugins {
-
 		err := p.Parse()
 		if err != nil {
 			return err

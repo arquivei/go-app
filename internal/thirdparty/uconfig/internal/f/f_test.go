@@ -7,7 +7,6 @@ import (
 )
 
 func TestUnmarshalerStringSlice(t *testing.T) {
-
 	expect := TextUnmarshalerStringSlice{"a", "b", "c"}
 	value := TextUnmarshalerStringSlice{}
 

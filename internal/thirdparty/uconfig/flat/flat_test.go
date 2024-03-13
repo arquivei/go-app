@@ -10,7 +10,6 @@ import (
 )
 
 func TestFlattenNested(t *testing.T) {
-
 	conf := f.Config{}
 	fs, err := flat.View(&conf)
 

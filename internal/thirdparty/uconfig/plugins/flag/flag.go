@@ -29,7 +29,6 @@ const (
 
 // New returns a new Flags
 func New(name string, errorHandling ErrorHandling, args []string) plugins.Plugin {
-
 	fs := flag.NewFlagSet(name, flag.ErrorHandling(errorHandling))
 	fs.Usage = func() {}
 
@@ -63,7 +62,6 @@ func (v *visitor) Parse() error {
 }
 
 func (v *visitor) Visit(fields flat.Fields) error {
-
 	for _, f := range fields {
 		usage, _ := f.Tag("usage")
 
@@ -83,5 +81,4 @@ func (v *visitor) Visit(fields flat.Fields) error {
 	}
 
 	return nil
-
 }

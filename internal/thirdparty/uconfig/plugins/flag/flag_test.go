@@ -10,7 +10,6 @@ import (
 )
 
 func TestFlagBasic(t *testing.T) {
-
 	args := []string{
 		"-gohard",
 		"-version=0.2",
@@ -65,7 +64,6 @@ type fFlag struct {
 }
 
 func TestFlagTag(t *testing.T) {
-
 	args := []string{
 		"-host=https://blah.bleh",
 	}

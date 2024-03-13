@@ -18,7 +18,6 @@ type Files = file.Files
 // and flags (in that order) and optionally file loaders based on the provided
 // Files map and parses them right away.
 func Classic(conf interface{}, files Files, userPlugins ...plugins.Plugin) (Config, error) {
-
 	fps := files.Plugins()
 
 	ps := make([]plugins.Plugin, 0, len(fps)+3+len(userPlugins))

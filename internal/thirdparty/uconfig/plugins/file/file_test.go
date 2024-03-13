@@ -14,7 +14,6 @@ import (
 )
 
 func TestFileReader(t *testing.T) {
-
 	expect := f.Config{
 		Anon: f.Anon{
 			Version: "0.2",
@@ -65,7 +64,6 @@ func TestFileReader(t *testing.T) {
 			json.Unmarshal,
 		},
 	} {
-
 		value := f.Config{}
 
 		conf, err := uconfig.New(&value, file.NewReader(tc.Source, tc.Unmarshall))
@@ -84,7 +82,6 @@ func TestFileReader(t *testing.T) {
 }
 
 func TestFileOpen(t *testing.T) {
-
 	expect := f.Config{
 		Anon: f.Anon{
 			Version: "0.2",
@@ -119,7 +116,6 @@ func TestFileOpen(t *testing.T) {
 			json.Unmarshal,
 		},
 	} {
-
 		value := f.Config{}
 
 		conf, err := uconfig.New(&value, file.New(tc.Source, tc.Unmarshall, file.Config{}))
@@ -138,7 +134,6 @@ func TestFileOpen(t *testing.T) {
 }
 
 func TestMulti(t *testing.T) {
-
 	expect := f.Config{
 		Anon: f.Anon{
 			Version: "0.2",
@@ -187,7 +182,6 @@ func TestMulti(t *testing.T) {
 }
 
 func TestBadFile(t *testing.T) {
-
 	open, err := os.Open("testdata/config_rethink.json")
 	if err != nil {
 		t.Fatal(err)
