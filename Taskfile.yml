@@ -1,0 +1,9 @@
+version: '3'
+
+tasks:
+  checks:
+    cmds:
+      - go vet ./...
+      - go build ./...
+      - go test ./...
+      - golangci-lint run
