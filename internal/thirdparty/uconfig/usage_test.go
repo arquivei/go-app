@@ -22,7 +22,7 @@ Redis.Host              -redis-host              REDIS_HOST                     
 Redis.Port              -redis-port              REDIS_PORT                         Redis.Port                                  
 Rethink.Host.Address    -rethink-host-address    RETHINK_HOST_ADDRESS               Rethink.Host.Address                        
 Rethink.Host.Port       -rethink-host-port       RETHINK_HOST_PORT                  Rethink.Host.Port                           
-Rethink.Db              -rethink-db              RETHINK_DB              primary    Rethink.Db                                  main database used by our application
+Rethink.DB              -rethink-db              RETHINK_DB              primary    Rethink.DB                                  main database used by our application
 Rethink.Password        -rethink-password        RETHINK_PASSWORD                   Rethink.Password        RETHINK_PASSWORD    
 `
 

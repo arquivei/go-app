@@ -37,7 +37,7 @@ func TestFlagBasic(t *testing.T) {
 				Address: "rethink-cluster",
 				Port:    "28015",
 			},
-			Db: "base",
+			DB: "base",
 		},
 	}
 

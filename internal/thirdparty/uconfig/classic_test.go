@@ -38,7 +38,7 @@ func TestClassicBasic(t *testing.T) {
 				Address: "rethink-cluster",
 				Port:    "28015",
 			},
-			Db: "base",
+			DB: "base",
 		},
 	}
 
@@ -85,7 +85,7 @@ func TestClassicWithSecret(t *testing.T) {
 				Address: "rethink-cluster",
 				Port:    "28015",
 			},
-			Db:       "base",
+			DB:       "base",
 			Password: "top secret token",
 		},
 
@@ -133,7 +133,7 @@ func TestClassicBadPlugin(t *testing.T) {
 		t.Error("expected error for bad plugin, got nil")
 	}
 
-	if err.Error() != "Unsupported plugins. Expecting a Walker or Visitor" {
+	if err.Error() != "unsupported plugins. Expecting a Walker or Visitor" {
 		t.Errorf("Expected unsupported plugin error, got: %v", err)
 	}
 }

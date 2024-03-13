@@ -21,7 +21,7 @@ type Host struct {
 // RethinkConfig is part of text fixtures.
 type RethinkConfig struct {
 	Host     Host
-	Db       string `default:"primary" usage:"main database used by our application"`
+	DB       string `default:"primary" usage:"main database used by our application"`
 	Password string `secret:""`
 }
 
@@ -50,7 +50,6 @@ func (l *TextUnmarshalerStringSlice) UnmarshalText(value []byte) error {
 
 // ensure the interfae is implemented properly.
 var _ encoding.TextUnmarshaler = &TextUnmarshalerStringSlice{}
-
 
 type Types struct {
 	String   string

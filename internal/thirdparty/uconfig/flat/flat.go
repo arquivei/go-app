@@ -4,12 +4,14 @@ package flat
 import (
 	"errors"
 	"reflect"
-	"strings"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 var (
 	// ErrUnexpectedType is returned when flatten sees an unsupported type.
-	ErrUnexpectedType = errors.New("Unexpected type, expecting a pointer to struct")
+	ErrUnexpectedType = errors.New("unexpected type, expecting a pointer to struct")
 )
 
 // Fields is a slice of Field.
@@ -41,7 +43,7 @@ func View(s interface{}) (Fields, error) {
 }
 
 func walkStruct(prefix string, rs reflect.Value) ([]Field, error) {
-	prefix = strings.Title(prefix)
+	prefix = cases.Title(language.Und, cases.NoLower).String(prefix)
 
 	fields := []Field{}
 

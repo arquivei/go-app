@@ -72,7 +72,7 @@ func (v *visitor) Visit(fields flat.Fields) error {
 
 		if !ok || name == "" {
 			name = f.Name()
-			name = strings.Replace(name, ".", "-", -1)
+			name = strings.ReplaceAll(name, ".", "-")
 			name = strings.ToLower(name)
 		}
 

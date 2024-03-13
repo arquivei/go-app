@@ -38,7 +38,7 @@ func TestEnvBasic(t *testing.T) {
 				Address: "rethink-cluster",
 				Port:    "28015",
 			},
-			Db: "",
+			DB: "",
 		},
 	}
 
@@ -46,7 +46,7 @@ func TestEnvBasic(t *testing.T) {
 		os.Setenv(key, value)
 	}
 
-	value := f.Config{Rethink: f.RethinkConfig{Db: "must-be-override-by-empty-env"}}
+	value := f.Config{Rethink: f.RethinkConfig{DB: "must-be-override-by-empty-env"}}
 
 	conf, err := uconfig.New(&value, env.New())
 	if err != nil {

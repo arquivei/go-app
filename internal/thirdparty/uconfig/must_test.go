@@ -60,7 +60,7 @@ func TestMustPanicNew(t *testing.T) {
 			t.Error("Was expecting panic but got nil")
 		}
 
-		expectErr := "Unexpected type, expecting a pointer to struct"
+		expectErr := "unexpected type, expecting a pointer to struct"
 
 		if err, ok := r.(error); !ok || err.Error() != expectErr {
 			t.Errorf("unexpected panic: %v", r)

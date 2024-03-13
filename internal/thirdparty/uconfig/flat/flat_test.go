@@ -24,7 +24,7 @@ func TestFlattenNested(t *testing.T) {
 		"Redis.Port":           false,
 		"Rethink.Host.Address": false,
 		"Rethink.Host.Port":    false,
-		"Rethink.Db":           false,
+		"Rethink.DB":           false,
 		"Rethink.Password":     false,
 	}
 
@@ -95,7 +95,7 @@ func TestFlattenTypes(t *testing.T) {
 		Uint64:   512,
 		Float32:  1.1,
 		Float64:  1.2,
-		Duration: time.Duration(5 * time.Second),
+		Duration: 5 * time.Second,
 
 		// Duration:        time.Second * 5,
 		// MapStringString: map[string]string{"a": "aval", "b": "bval"},

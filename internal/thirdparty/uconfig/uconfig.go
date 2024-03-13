@@ -71,7 +71,7 @@ func (c *config) addPlugin(plug plugins.Plugin) error {
 		}
 
 	default:
-		return fmt.Errorf("Unsupported plugins. Expecting a Walker or Visitor")
+		return fmt.Errorf("unsupported plugins. Expecting a Walker or Visitor")
 	}
 
 	c.plugins = append(c.plugins, plug)

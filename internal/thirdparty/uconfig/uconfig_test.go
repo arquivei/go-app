@@ -27,7 +27,7 @@ func TestBadPlug(t *testing.T) {
 		t.Error("expected error for bad plugin, got nil")
 	}
 
-	if err.Error() != "Unsupported plugins. Expecting a Walker or Visitor" {
+	if err.Error() != "unsupported plugins. Expecting a Walker or Visitor" {
 		t.Errorf("Expected unsupported plugin error, got: %v", err)
 	}
 }

@@ -25,7 +25,7 @@ type visitor struct {
 }
 
 func makeEnvName(name string) string {
-	name = strings.Replace(name, ".", "_", -1)
+	name = strings.ReplaceAll(name, ".", "_")
 	name = strings.ToUpper(name)
 
 	return name
