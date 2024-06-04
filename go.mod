@@ -2,13 +2,13 @@ module github.com/arquivei/go-app
 
 go 1.22
 
-toolchain go1.22.3
+toolchain go1.22.4
 
 require (
 	github.com/prometheus/client_golang v1.19.1
-	github.com/rs/zerolog v1.32.0
+	github.com/rs/zerolog v1.33.0
 	github.com/stretchr/testify v1.9.0
-	golang.org/x/text v0.15.0
+	golang.org/x/text v0.16.0
 )
 
 require (
