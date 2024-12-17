@@ -65,19 +65,21 @@ func (g *ProbeGroup) NewProbe(name string, ok bool) (Probe, error) {
 		return Probe{}, err
 	}
 
-	return g.newProbe(name, ok)
+	return g.newProbe(name, ok), nil
 }
 
 func (g *ProbeGroup) checkProbeAlreadyExists(name string) error {
 	if _, ok := g.probes[name]; ok {
 		return fmt.Errorf("probe '%s' already registered", name)
 	}
+
 	return nil
 }
 
-func (g *ProbeGroup) newProbe(name string, ok bool) (Probe, error) {
+func (g *ProbeGroup) newProbe(name string, ok bool) Probe {
 	g.probes[name] = &ok
-	return Probe{&ok}, nil
+
+	return Probe{&ok}
 }
 
 // MustNewProbe returns a new Probe with the given name and panics in case of error.
@@ -86,6 +88,7 @@ func (g *ProbeGroup) MustNewProbe(name string, ok bool) Probe {
 	if err != nil {
 		panic(err)
 	}
+
 	return p
 }
 
@@ -108,6 +111,7 @@ func (ProbeGroup) checkName(name string) error {
 	if !reIsValidProbeName.MatchString(name) {
 		return fmt.Errorf("name '%s' doesn't conform to '[a-zA-Z0-9_-]{3,}'", name)
 	}
+
 	return nil
 }
 
