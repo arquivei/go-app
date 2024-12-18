@@ -3,6 +3,7 @@ package logger
 import (
 	"io"
 	stdlog "log"
+	"log/slog"
 	"os"
 	"runtime"
 	"strings"
@@ -41,6 +42,8 @@ func Setup(config Config, version string, extraLogWriters ...io.Writer) {
 	hooked := log.Hook(noLevelWarnHook{})
 	stdlog.SetFlags(0)
 	stdlog.SetOutput(hooked)
+
+	slog.SetDefault(slog.New(&slogHandler{logger: &log.Logger}))
 }
 
 // MustParseLevel transforms a string in a zerolog level
