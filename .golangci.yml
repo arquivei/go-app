@@ -20,7 +20,7 @@ linters:
     - bodyclose # checks whether HTTP response body is closed successfully
     - dupl # Tool for code clone detection
     - errcheck # Errcheck is a program for checking for unchecked errors in go programs. These unchecked errors can be critical bugs in some cases
-    - exportloopref # checks for pointers to enclosing loop variables
+    - copyloopvar # checks for pointers to enclosing loop variables
     - goconst # Finds repeated strings that could be replaced by a constant
     - gocritic # The most opinionated Go source code linter
     - gocyclo # Computes and checks the cyclomatic complexity of functions
