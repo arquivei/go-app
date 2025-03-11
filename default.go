@@ -1,7 +1,14 @@
 package app
 
 import (
+	"bytes"
 	"context"
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"strings"
+	"time"
 
 	"github.com/arquivei/go-app/logger"
 
@@ -22,6 +29,12 @@ func Bootstrap(appVersion string, config AppConfig) {
 	SetupConfig(config)
 	appConfig := config.GetAppConfig()
 	logger.Setup(appConfig.App.Log, appVersion)
+
+	if shouldCheckProbeInsteadOfCreatingApp(appConfig) {
+		checkReadyOrHealthyProbesAndExit(appConfig)
+		// This is a fallback. It should never happen.
+		log.Fatal().Msg("[app] This should never happen. No check enabled.")
+	}
 
 	log.Info().Str("config", logger.Flatten(config)).Msg("[app] Configuration loaded and global logger configured.")
 	defaultApp = New(appConfig)
@@ -69,4 +82,88 @@ func HealthinessProbeGroup() *ProbeGroup {
 		panic("default app not initialized")
 	}
 	return &defaultApp.Healthy
+}
+
+func shouldCheckProbeInsteadOfCreatingApp(cfg Config) bool {
+	return cfg.App.Check.Ready || cfg.App.Check.Healthy
+}
+
+func checkReadyOrHealthyProbesAndExit(cfg Config) {
+	if cfg.App.Check.Ready && cfg.App.Check.Healthy {
+		log.Fatal().Msg("[app] Both ready and alive checks are enabled. Please, use only one.")
+	}
+
+	baseURL := extractBaseURL(cfg.App.AdminServer.Addr)
+
+	if cfg.App.Check.Ready {
+		handleProbeResponseAndExit(checkReady(baseURL))
+	}
+
+	if cfg.App.Check.Healthy {
+		handleProbeResponseAndExit(checkHealthy(baseURL))
+	}
+
+	// This is a fallback. It should never happen.
+	log.Fatal().Msg("[app] This should never happen. No check enabled.")
+}
+
+func extractBaseURL(addr string) string {
+	_, port, found := strings.Cut(addr, ":")
+	if !found {
+		log.Fatal().Msg("[app] Invalid admin server address.")
+	}
+	return "http://localhost:" + port
+}
+
+func checkReady(baseURL string) error {
+	return checkProbe(baseURL + "/ready")
+}
+
+const httpProbeTimeout = 3 * time.Second
+
+func checkHealthy(baseURL string) error {
+	return checkProbe(baseURL + "/healthy")
+}
+
+func checkProbe(url string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), httpProbeTimeout)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return err
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+
+	responseBody := readResponseBody(resp)
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("probe failed: %s", responseBody)
+	}
+
+	return nil
+}
+
+func readResponseBody(resp *http.Response) string {
+	responseBody := bytes.NewBuffer([]byte{})
+	_, err := io.Copy(responseBody, resp.Body)
+	if err != nil {
+		log.Error().Err(err).Msg("[app] Failed to read response body.")
+	}
+	resp.Body.Close()
+
+	return responseBody.String()
+}
+
+func handleProbeResponseAndExit(err error) {
+	if err != nil {
+		log.Fatal().Err(err).Msg("[app] Probe NOT OK.")
+	}
+
+	log.Info().Msg("[app] Probe OK.")
+	os.Exit(0)
 }
