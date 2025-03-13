@@ -4,6 +4,11 @@
 //
 // To run this program in the commandline you could use:
 //   go run ./examples/probes/main.go -app-log-human --app-log-level=trace
+//
+// To check the probes statuses from outside the process you could use:
+//   go run ./examples/probes/main.go -app-log-human -app-check-ready
+//     or
+//   go run ./examples/probes/main.go -app-log-human -app-check-healthy
 
 package main
 

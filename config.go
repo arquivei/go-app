@@ -41,6 +41,13 @@ type Config struct {
 		Config struct {
 			Output string
 		}
+		// Check executes a heathy check on the application.
+		Check struct {
+			// Ready checks if the application is ready to receive requests.
+			Ready bool
+			// Healthy checks if the application is alive.
+			Healthy bool
+		}
 	}
 }
 
