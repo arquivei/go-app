@@ -9,6 +9,7 @@ package main
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/arquivei/go-app"
 	"github.com/rs/zerolog/log"
@@ -55,7 +56,11 @@ func main() {
 }
 
 func newHTTPServer() *http.Server {
-	httpServer := &http.Server{Addr: cfg.HTTP.Addr, Handler: http.FileServer(http.Dir(cfg.Dir))}
+	httpServer := &http.Server{
+		Addr:              cfg.HTTP.Addr,
+		Handler:           http.FileServer(http.Dir(cfg.Dir)),
+		ReadHeaderTimeout: 10 * time.Second,
+	}
 
 	// You can register the shutdown handlers at any order, but do it before starting the app
 	app.RegisterShutdownHandler(

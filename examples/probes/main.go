@@ -50,6 +50,8 @@ func main() {
 		for ctx.Err() == nil {
 			time.Sleep(time.Second)
 
+			// This is just an example, we are not using TLS here.
+			//nolint: gosec, noctx
 			resp, err := http.Get(readinessURL)
 			if err != nil {
 				log.Error().Err(err).Msg("Failed to fetch probe")
@@ -60,6 +62,9 @@ func main() {
 				log.Error().Err(err).Msg("Failed to read probe")
 				continue
 			}
+			// nolint: errcheck, gosec
+			resp.Body.Close()
+
 			log.Info().Int("http_status", resp.StatusCode).Msgf("Probe says: %s", b)
 		}
 		return ctx.Err()

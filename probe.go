@@ -100,7 +100,7 @@ func (g *ProbeGroup) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	} else {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
-	//nolint:errcheck
+	//nolint: errcheck, gosec
 	w.Write([]byte(cause))
 	log.Trace().Str("probe_group", g.name).Bool("probe_is_ok", ok).Str("cause", cause).Msg("[app] App was probed.")
 }

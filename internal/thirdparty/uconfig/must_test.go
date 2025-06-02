@@ -42,6 +42,7 @@ func TestMustPanic(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// nolint: errcheck, gosec
 	open.Close() // close it so we get an error!
 	reader := file.NewReader(open, json.Unmarshal)
 

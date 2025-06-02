@@ -60,6 +60,8 @@ func New(path string, unmarshal Unmarshal, config Config) plugins.Plugin {
 		unmarshal: unmarshal,
 	}
 
+	// gosec complains about opening a file via variable, but this is what we want.
+	// nolint: gosec
 	src, err := os.Open(path)
 
 	if err == nil {

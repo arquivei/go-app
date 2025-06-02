@@ -8,6 +8,7 @@ import (
 	"github.com/arquivei/go-app/internal/thirdparty/uconfig/internal/f"
 	"github.com/arquivei/go-app/internal/thirdparty/uconfig/plugins/env"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestEnvBasic(t *testing.T) {
@@ -43,21 +44,17 @@ func TestEnvBasic(t *testing.T) {
 	}
 
 	for key, value := range envs {
-		os.Setenv(key, value)
+		err := os.Setenv(key, value)
+		require.NoError(t, err, "failed to set env var %s", key)
 	}
 
 	value := f.Config{Rethink: f.RethinkConfig{DB: "must-be-override-by-empty-env"}}
 
 	conf, err := uconfig.New(&value, env.New())
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	err = conf.Parse()
-
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	assert.Equal(t, expect, value)
 }
@@ -72,7 +69,8 @@ func TestEnvTag(t *testing.T) {
 	}
 
 	for key, value := range envs {
-		os.Setenv(key, value)
+		err := os.Setenv(key, value)
+		require.NoError(t, err, "failed to set env var %s", key)
 	}
 
 	expect := fEnv{

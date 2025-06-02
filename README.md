@@ -126,3 +126,7 @@ repository](https://github.com/arquivei/go-app/tags).
 
 This project is licensed under the _BSD 3-Clause_ - see the [LICENSE.txt](LICENSE.txt) file for
 details.
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=arquivei/go-app&type=Date)](https://www.star-history.com/#arquivei/go-app&Date)
