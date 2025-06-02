@@ -154,6 +154,7 @@ func readResponseBody(resp *http.Response) string {
 	if err != nil {
 		log.Error().Err(err).Msg("[app] Failed to read response body.")
 	}
+	//nolint: errcheck, gosec
 	resp.Body.Close()
 
 	return responseBody.String()

@@ -11,6 +11,7 @@ import (
 	"github.com/arquivei/go-app/internal/thirdparty/uconfig/internal/f"
 	"github.com/arquivei/go-app/internal/thirdparty/uconfig/plugins/secret"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestMain(m *testing.M) {
@@ -49,15 +50,15 @@ func TestClassicBasic(t *testing.T) {
 	value := f.Config{}
 
 	// set some env vars to test env var and plugin orders.
-	os.Setenv("VERSION", "bad-value-overrided-with-flags")
-	os.Setenv("REDIS_HOST", "from-envs")
+	err := os.Setenv("VERSION", "bad-value-overrided-with-flags")
+	require.NoError(t, err)
+	err = os.Setenv("REDIS_HOST", "from-envs")
+	require.NoError(t, err)
 	// patch the os.Args. for our tests.
 	os.Args = append(os.Args[:1], "-version=from-flags")
 
-	_, err := uconfig.Classic(&value, files)
-	if err != nil {
-		t.Fatal(err)
-	}
+	_, err = uconfig.Classic(&value, files)
+	require.NoError(t, err)
 
 	assert.Equal(t, expect, value)
 }
@@ -112,12 +113,11 @@ func TestClassicWithSecret(t *testing.T) {
 
 	// patch the os.Args. for our tests.
 	os.Args = os.Args[:1]
-	os.Unsetenv("REDIS_HOST")
+	err := os.Unsetenv("REDIS_HOST")
+	require.NoError(t, err)
 
-	_, err := uconfig.Classic(&value, files, secret.New(SecretProvider))
-	if err != nil {
-		t.Fatal(err)
-	}
+	_, err = uconfig.Classic(&value, files, secret.New(SecretProvider))
+	require.NoError(t, err)
 
 	assert.Equal(t, expect, value)
 }

@@ -1,4 +1,4 @@
-// This example shows how panics are captured and gracefuly printed.
+// This example shows how panics are captured and gracefully printed.
 //
 // To run this example
 // go run -ldflags="-X main.version=v0.0.1" ./examples/panic/ -app-log-human -app-log-level=trace
@@ -20,7 +20,7 @@ var (
 func main() {
 	defer app.Recover()
 
-	app.Bootstrap("", &cfg)
+	app.Bootstrap(version, &cfg)
 
 	// Comment this next line to see the other panic
 	thisWillPanic()
