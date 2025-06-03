@@ -118,8 +118,11 @@ func TestShutdownHandlerExecute_Timeout(t *testing.T) {
 	sh := &ShutdownHandler{
 		Name: "my_failed_shutdown_handler",
 		Handler: func(ctx context.Context) error {
+			// We will simulate a long-running operation that exceeds the timeout
+			// Reading from a nil channel will block indefinitely
+			var c <-chan struct{}
 			select {
-			case <-time.After(2 * time.Nanosecond):
+			case <-c:
 				return nil
 			case <-ctx.Done():
 				return errors.New("custom handler error on deadline exceeded")
