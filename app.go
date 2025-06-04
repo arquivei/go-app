@@ -26,6 +26,8 @@ type App struct {
 	Ready   ProbeGroup
 	Healthy ProbeGroup
 
+	restart *restartHandler
+
 	mainLoopCtx       context.Context
 	cancelMainLoopCtx func()
 
@@ -68,6 +70,8 @@ func New(c Config) *App {
 		},
 		readinessProbe:   readinessProbeGroup.MustNewProbe("fkit/app", false),
 		healthinessProbe: healthinessProbeGroup.MustNewProbe("fkit/app", true),
+
+		restart: NewRestartHandler(c.App.Restart.Policy, c.App.Restart.Max),
 	}
 
 	app.startAdminServer(c)
@@ -209,7 +213,21 @@ func (app *App) runMainLoop(mainLoop MainLoopFunc, errs chan<- error) {
 	log.Info().Msg("[app] Application main loop starting now!")
 	app.readinessProbe.SetOk()
 
-	errs <- mainLoop(app.mainLoopCtx)
+	for {
+		err := mainLoop(app.mainLoopCtx)
+		if app.restart.ShouldRestart(err) {
+			app.restart.IncrementRestartCounter()
+			log.Warn().
+				Err(err).
+				Uint64("restart_counter", app.restart.GetRestartCounter()).
+				Uint64("max_restarts", app.restart.GetMaxRestarts()).
+				Str("restart_policy", app.restart.policy.String()).
+				Msg("[app] Main Loop finished by itself, restarting application main loop.")
+			continue
+		}
+		errs <- err
+		break
+	}
 }
 
 func (app *App) waitMainLoopOrSignal(errs <-chan error) {
@@ -221,7 +239,7 @@ func (app *App) waitMainLoopOrSignal(errs <-chan error) {
 		if err != nil {
 			log.Error().Err(err).Msg("[app] Main Loop finished by itself with error.")
 		} else {
-			log.Warn().Msg("[app] Main Loop finished by itself without error. Ideally the main loop should be finished by a graceful shutdown handler.")
+			log.Info().Msg("[app] Main Loop finished by itself without error.")
 		}
 	case <-gracefulShutdownCtx.Done():
 		log.Info().

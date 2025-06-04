@@ -48,6 +48,10 @@ type Config struct {
 			// Healthy checks if the application is alive.
 			Healthy bool
 		}
+		Restart struct {
+			Policy RestartPolicy `default:"never"`
+			Max    uint64
+		}
 	}
 }
 
