@@ -47,6 +47,32 @@ func ErrorPolicyString(p ErrorPolicy) string {
 // ShutdownFunc is a shutdown function that will be executed when the app is shutting down.
 type ShutdownFunc func(context.Context) error
 
+// NewShutdownFunc creates a ShutdownFunc from a function of type
+// func(), func() error, func(context.Context), or func(context.Context) error.
+// This is a helper function to convert different function signatures into a ShutdownFunc.
+func NewShutdownFunc[T func() | func() error | func(context.Context) | func(context.Context) error](fn T) ShutdownFunc {
+	switch fn := any(fn).(type) {
+	case func():
+		return func(ctx context.Context) error {
+			fn()
+			return nil
+		}
+	case func() error:
+		return func(ctx context.Context) error {
+			return fn()
+		}
+	case func(context.Context):
+		return func(ctx context.Context) error {
+			fn(ctx)
+			return nil
+		}
+	case func(context.Context) error:
+		return fn
+	default:
+		panic("NewShutdownFunc: unsupported function type")
+	}
+}
+
 // ShutdownHandler is a shutdown structure that allows configuring
 // and storing shutdown information of an orchestrated shutdown flow.
 type ShutdownHandler struct {

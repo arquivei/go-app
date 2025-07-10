@@ -42,11 +42,30 @@ func Bootstrap(appVersion string, config AppConfig) {
 
 // RunAndWait executes the main loop on a go-routine and listens to SIGINT and SIGKILL to start the shutdown.
 // This is expected to be called only once and will panic if called a second time.
-func RunAndWait(f MainLoopFunc) {
+func RunAndWait[T func() | func() error | func(context.Context) | func(context.Context) error](f T) {
 	if defaultApp == nil {
 		panic("default app not initialized")
 	}
-	defaultApp.RunAndWait(f)
+	switch fn := any(f).(type) {
+	case func():
+		defaultApp.RunAndWait(func(context.Context) error {
+			fn()
+			return nil
+		})
+	case func() error:
+		defaultApp.RunAndWait(func(context.Context) error {
+			return fn()
+		})
+	case func(context.Context):
+		defaultApp.RunAndWait(func(ctx context.Context) error {
+			fn(ctx)
+			return nil
+		})
+	case func(context.Context) error:
+		defaultApp.RunAndWait(fn)
+	default:
+		panic(fmt.Sprintf("RunAndWait: unsupported function type %T", f))
+	}
 }
 
 // Shutdown calls all shutdown methods ordered by priority.

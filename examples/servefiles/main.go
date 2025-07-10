@@ -7,7 +7,6 @@
 package main
 
 import (
-	"context"
 	"net/http"
 	"time"
 
@@ -46,13 +45,12 @@ func main() {
 
 	// Run the main loop until it finishes or receives termination signal
 	// On this point the readiness probe starts returning success.
-	app.RunAndWait(func(_ context.Context) error {
-		log.Info().
-			Str("dir", cfg.Dir).
-			Str("port", cfg.HTTP.Addr).
-			Msg("Serving directory.")
-		return httpServer.ListenAndServe()
-	})
+	log.Info().
+		Str("dir", cfg.Dir).
+		Str("port", cfg.HTTP.Addr).
+		Msg("Serving directory.")
+
+	app.RunAndWait(httpServer.ListenAndServe)
 }
 
 func newHTTPServer() *http.Server {
