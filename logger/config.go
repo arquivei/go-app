@@ -22,7 +22,7 @@ type Config struct {
 // also the go's log package.
 func Setup(config Config, version string, extraLogWriters ...io.Writer) {
 	if config.Human {
-		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout})
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	}
 
 	if len(extraLogWriters) > 0 {
