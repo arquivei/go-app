@@ -19,7 +19,7 @@ func init() {
 }
 
 // UsageOutput is the io.Writer used by Usage message printer.
-var UsageOutput io.Writer = os.Stdout
+var UsageOutput io.Writer = os.Stderr
 
 // Usage prints out the current config fields, flags, env vars
 // and any other source and setting.
@@ -33,10 +33,7 @@ func (c *config) Usage() {
 
 	dashes := make([]string, len(headers))
 	for i, f := range headers {
-		n := len(f)
-		if n < 5 {
-			n = 5
-		}
+		n := max(len(f), 5)
 		dashes[i] = strings.Repeat("-", n)
 	}
 	fmt.Fprintln(w, strings.Join(dashes, "\t"))
