@@ -40,17 +40,20 @@ Check all available options with `go run ./ -h`
 
 ```text
 Supported Fields:
-FIELD                             FLAG                               ENV                               DEFAULT
------                             -----                              -----                             -------
-App.Log.Level                     -app-log-level                     APP_LOG_LEVEL                     info
-App.Log.Human                     -app-log-human                     APP_LOG_HUMAN
-App.AdminServer.Enabled           -app-adminserver-enabled           APP_ADMINSERVER_ENABLED           true
-App.AdminServer.Addr              -app-adminserver-addr              APP_ADMINSERVER_ADDR              localhost:9000
-App.AdminServer.With.DebugURLs    -app-adminserver-with-debugurls    APP_ADMINSERVER_WITH_DEBUGURLS    true
-App.AdminServer.With.Metrics      -app-adminserver-with-metrics      APP_ADMINSERVER_WITH_METRICS      true
-App.AdminServer.With.Probes       -app-adminserver-with-probes       APP_ADMINSERVER_WITH_PROBES       true
-App.Shutdown.GracePeriod          -app-shutdown-graceperiod          APP_SHUTDOWN_GRACEPERIOD          3s
-App.Shutdown.Timeout              -app-shutdown-timeout              APP_SHUTDOWN_TIMEOUT              5s
+FIELD                             FLAG                               ENV                               DEFAULT           USAGE
+-----                             -----                              -----                             -------           -----
+App.Log.Level                     -app-log-level                     APP_LOG_LEVEL                     info              The log level. Possible values are: trace, debug, info, warn, error, fatal and panic.
+App.Log.Human                     -app-log-human                     APP_LOG_HUMAN                     false             Whether to use human friendly log output. If true, the log will be printed in a human friendly format. If false, the log will be printed in JSON format.
+App.AdminServer.Enabled           -app-adminserver-enabled           APP_ADMINSERVER_ENABLED           true              Enables the admin server
+App.AdminServer.Addr              -app-adminserver-addr              APP_ADMINSERVER_ADDR              localhost:9000    The address the admin server will bind to. To bind to all interfaces, use :9000.
+App.AdminServer.With.DebugURLs    -app-adminserver-with-debugurls    APP_ADMINSERVER_WITH_DEBUGURLS    true              Enables the /debug URLs in the admin server.
+App.AdminServer.With.Metrics      -app-adminserver-with-metrics      APP_ADMINSERVER_WITH_METRICS      true              Enables the /metrics endpoint in the admin server.
+App.AdminServer.With.Probes       -app-adminserver-with-probes       APP_ADMINSERVER_WITH_PROBES       true              Enables the /ready and /healthy endpoints in the admin server.
+App.Shutdown.GracePeriod          -app-shutdown-graceperiod          APP_SHUTDOWN_GRACEPERIOD          3s                The grace period for the shutdown procedure. During normal shutdown procedures, the shutdown function will wait this amount of time before actually starting calling the shutdown handlers.
+App.Shutdown.Timeout              -app-shutdown-timeout              APP_SHUTDOWN_TIMEOUT              5s                The timeout for the shutdown procedure. If the shutdown procedure takes longer than this value, the application will force exit.
+App.Config.Output                 -app-config-output                 APP_CONFIG_OUTPUT                                   Prints the configuration in the desired format and exit. Possible values are: env, yaml and json.
+App.Check.Ready                   -app-check-ready                   APP_CHECK_READY                   false             Whether to execute a ready check on the application. If true, the application will execute the ready check and exit with code 0 if the check is successful or with code 1 if the check fails.
+App.Check.Healthy                 -app-check-healthy                 APP_CHECK_HEALTHY                 false             Whether to execute a healthy check on the application. If true, the application will execute the healthy check and exit with code 0 if the check is successful or with code 1 if the check fails.
 ```
 
 There is a special option to print out the default configuration in `env` or `yaml` format: `go run . -app-config-output=env`.
