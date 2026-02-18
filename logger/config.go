@@ -14,8 +14,10 @@ import (
 
 // Config is the log configuration struct
 type Config struct {
-	Level string `default:"info"`
-	Human bool
+	// Level is the log level. Possible values are: trace, debug, info, warn, error, fatal and panic.
+	Level string `default:"info" usage:"The log level. Possible values are: trace, debug, info, warn, error, fatal and panic."`
+	// Human sets whether to use human friendly log output. If true, the log will be printed in a human friendly format. If false, the log will be printed in JSON format.
+	Human bool `default:"false" usage:"Whether to use human friendly log output. If true, the log will be printed in a human friendly format. If false, the log will be printed in JSON format."`
 }
 
 // SetupLogger sets the global logger by configuring the global zerolog.Log and
