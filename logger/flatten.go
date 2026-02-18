@@ -16,26 +16,26 @@ import (
 // Flatten will place ALL keys of the given structure on
 // the resulted string. This means that ANY sensitive data
 // in the flattened structure WILL be exposed!
-func Flatten(value interface{}) string {
+func Flatten(value any) string {
 	m := flattenPrefixed(value, "")
 	sb := strings.Builder{}
 	for k, v := range m {
 		sb.WriteString(k)
 		sb.WriteString(": ")
-		sb.WriteString(fmt.Sprintf("'%v'", v))
+		fmt.Fprintf(&sb, "'%v'", v)
 		sb.WriteString(", ")
 	}
 
 	return strings.Trim(sb.String(), ", ")
 }
 
-func flattenPrefixed(value interface{}, prefix string) map[string]interface{} {
-	m := make(map[string]interface{})
+func flattenPrefixed(value any, prefix string) map[string]any {
+	m := make(map[string]any)
 	flattenPrefixedToResult(value, prefix, m)
 	return m
 }
 
-func flattenPrefixedToResult(value interface{}, prefix string, m map[string]interface{}) {
+func flattenPrefixedToResult(value any, prefix string, m map[string]any) {
 	if value == nil {
 		return
 	}
