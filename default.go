@@ -152,7 +152,9 @@ func checkProbe(url string) error {
 	if err != nil {
 		return err
 	}
-
+	// #nosec: G704
+	// This is a false positive because the URL is always localhost and the
+	// port is retrieved from the admin server configuration.
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err

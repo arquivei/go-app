@@ -8,22 +8,21 @@ import (
 	"github.com/arquivei/go-app/internal/thirdparty/uconfig/flat"
 	"github.com/arquivei/go-app/internal/thirdparty/uconfig/internal/f"
 	"github.com/arquivei/go-app/internal/thirdparty/uconfig/plugins"
-	"github.com/arquivei/go-app/internal/thirdparty/uconfig/plugins/secret"
 	"github.com/stretchr/testify/assert"
 )
 
 const expectedUsageMessage = `
 Supported Fields:
-FIELD                   FLAG                     ENV                     DEFAULT    GOODPLUGIN              SECRET              USAGE
------                   -----                    -----                   -------    ----------              ------              -----
-Version                 -version                 VERSION                            Version                                     
-GoHard                  -gohard                  GOHARD                             GoHard                                      
-Redis.Host              -redis-host              REDIS_HOST                         Redis.Host                                  
-Redis.Port              -redis-port              REDIS_PORT                         Redis.Port                                  
-Rethink.Host.Address    -rethink-host-address    RETHINK_HOST_ADDRESS               Rethink.Host.Address                        
-Rethink.Host.Port       -rethink-host-port       RETHINK_HOST_PORT                  Rethink.Host.Port                           
-Rethink.DB              -rethink-db              RETHINK_DB              primary    Rethink.DB                                  main database used by our application
-Rethink.Password        -rethink-password        RETHINK_PASSWORD                   Rethink.Password        RETHINK_PASSWORD    
+FIELD                   FLAG                     ENV                     DEFAULT    GOODPLUGIN              USAGE
+-----                   -----                    -----                   -------    ----------              -----
+Version                 -version                 VERSION                            Version                 
+GoHard                  -gohard                  GOHARD                             GoHard                  
+Redis.Host              -redis-host              REDIS_HOST                         Redis.Host              
+Redis.Port              -redis-port              REDIS_PORT                         Redis.Port              
+Rethink.Host.Address    -rethink-host-address    RETHINK_HOST_ADDRESS               Rethink.Host.Address    
+Rethink.Host.Port       -rethink-host-port       RETHINK_HOST_PORT                  Rethink.Host.Port       
+Rethink.DB              -rethink-db              RETHINK_DB              primary    Rethink.DB              main database used by our application
+Rethink.Password        -rethink-password        RETHINK_PASSWORD                   Rethink.Password        
 `
 
 type UselessPluginVisitor struct {
@@ -55,9 +54,7 @@ func TestUsage(t *testing.T) {
 
 	value := f.Config{}
 
-	secretProvider := func(name string) (string, error) { return "top secret token", nil }
-
-	c, err := uconfig.Classic(&value, nil, secret.New(secretProvider), noopPlugin)
+	c, err := uconfig.Classic(&value, nil, noopPlugin)
 	if err != nil {
 		t.Fatal(err)
 	}
