@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/pprof" // Sadly, this also changes the DefaultMux to have the pprof URLs
+	"os"
 	"os/signal"
 	"sync"
 	"sync/atomic"
@@ -183,16 +184,22 @@ func (app *App) RunAndWait(mainLoop MainLoopFunc) {
 	// Run main loop on a go-routine
 	errs := make(chan error, 1)
 	go app.runMainLoop(mainLoop, errs)
-	app.waitMainLoopOrSignal(errs)
+	err := app.waitMainLoopOrSignal(errs)
 
 	// App is shutting down...
 	app.readinessProbe.SetNotOk()
 	app.waitGracePeriod()
-	_ = app.Shutdown(context.Background())
+	shutdownErr := app.Shutdown(context.Background())
 	app.waitMainLoopFinish(10 * time.Second)
 
 	// This forces kubernetes kills the pod if some other code is holding the main func.
 	app.healthinessProbe.SetNotOk()
+
+	// Ensure that the app finishes with an error code if the main loop finished by itself
+	// with an error or if the shutdown procedure failed with an error.
+	if err != nil || shutdownErr != nil {
+		os.Exit(1)
+	}
 }
 
 func (app *App) runMainLoop(mainLoop MainLoopFunc, errs chan<- error) {
@@ -212,7 +219,7 @@ func (app *App) runMainLoop(mainLoop MainLoopFunc, errs chan<- error) {
 	errs <- mainLoop(app.mainLoopCtx)
 }
 
-func (app *App) waitMainLoopOrSignal(errs <-chan error) {
+func (app *App) waitMainLoopOrSignal(errs <-chan error) error {
 	gracefulShutdownCtx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
 
@@ -220,14 +227,16 @@ func (app *App) waitMainLoopOrSignal(errs <-chan error) {
 	case err := <-errs:
 		if err != nil {
 			log.Error().Err(err).Msg("[app] Main Loop finished by itself with error.")
+			return err
 		} else {
-			log.Warn().Msg("[app] Main Loop finished by itself without error. Ideally the main loop should be finished by a graceful shutdown handler.")
+			log.Info().Msg("[app] Main Loop finished by itself.")
 		}
 	case <-gracefulShutdownCtx.Done():
 		log.Info().
 			Dur("grace_period", app.shutdown.gracePeriod).
 			Msg("[app] Graceful shutdown signal received.")
 	}
+	return nil
 }
 
 func (app *App) waitGracePeriod() {
