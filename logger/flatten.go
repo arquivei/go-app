@@ -51,6 +51,11 @@ func flattenPrefixedToResult(value any, prefix string, m map[string]any) {
 		original = reflect.Indirect(original)
 		kind = original.Kind()
 	}
+
+	if original == (reflect.Value{}) {
+		return
+	}
+
 	t := original.Type()
 
 	switch kind {
