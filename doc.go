@@ -90,8 +90,8 @@ If the application is unready kubernetes will stop sending requests, but if the 
 
 A probe only exists as part of a group so the group provides a proper constructor for a probe. Probe's name must also be unique for the group but can be reused on different groups.
 
-	readinessProbe, err := app.Ready.NewProbe("fkit/app", false)
-	healthnessProbe, err := app.Healthy.NewProbe("fkit/app", true)
+	readinessProbe, err := app.Ready.NewProbe("go-app/app", false)
+	healthnessProbe, err := app.Healthy.NewProbe("go-app/app", true)
 
 The probe is automatically added to the group and any change is automatically reflected on the group it belongs to and the HTTP probe endpoints.
 

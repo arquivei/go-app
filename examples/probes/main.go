@@ -32,7 +32,7 @@ var (
 func main() {
 	app.Bootstrap(version, &cfg)
 
-	exampleProbe, err := app.ReadinessProbeGoup().NewProbe("example_probe", true) // HL
+	exampleProbe, err := app.ReadinessProbeGroup().NewProbe("example_probe", true) // HL
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to create probe")
 	}

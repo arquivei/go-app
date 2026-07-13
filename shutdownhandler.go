@@ -172,7 +172,7 @@ func (sq shutdownHeap) Swap(i, j int) {
 	sq[i].index, sq[j].index = i, j
 }
 
-func (sq *shutdownHeap) Push(x interface{}) {
+func (sq *shutdownHeap) Push(x any) {
 	sh := x.(*ShutdownHandler)
 	n := len(*sq)
 	sh.order = n
@@ -180,7 +180,7 @@ func (sq *shutdownHeap) Push(x interface{}) {
 	*sq = append(*sq, sh)
 }
 
-func (sq *shutdownHeap) Pop() interface{} {
+func (sq *shutdownHeap) Pop() any {
 	old := *sq
 	n := len(old)
 	sh := old[n-1]
