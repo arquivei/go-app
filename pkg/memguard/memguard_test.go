@@ -57,18 +57,23 @@ func TestStart_StopsWhenContextCanceled(t *testing.T) {
 	// This test checks that there is no deadlock or panic after cancellation.
 }
 
-func TestStart_PanicsOnSecondCall(t *testing.T) {
-	g := New(Config{ThresholdPct: 80, goMemLimit: 1 << 62})
+func TestStart_SecondCallIsNoOp(t *testing.T) {
+	interval := 20 * time.Millisecond
+	g := New(Config{ThresholdPct: 80, goMemLimit: 1 << 62, SamplingInterval: interval})
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	g.Start(ctx)
-	assert.PanicsWithValue(t, "memguard: Guard.Start called more than once", func() {
+	assert.NotPanics(t, func() {
 		g.Start(ctx)
-	})
+	}, "a second Start call should be a gracefully-ignored no-op, not a panic")
+
+	// The original sampling goroutine should keep running unaffected.
+	time.Sleep(2 * interval)
+	assert.Greater(t, g.usedBytes.Load(), int64(0), "the first goroutine should still be sampling after a redundant second Start call")
 }
 
-func TestStart_DisabledGuardDoesNotPanicOnMultipleCalls(t *testing.T) {
+func TestStart_DisabledGuardIgnoresMultipleCalls(t *testing.T) {
 	g := New(Config{ThresholdPct: 80, goMemLimit: math.MaxInt64})
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
