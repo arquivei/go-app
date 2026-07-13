@@ -48,7 +48,8 @@ type Config struct {
 // Guard monitors process memory usage and signals overload once
 // consumption reaches the configured threshold.
 //
-// A Guard must have Start called at most once; a second call panics.
+// Start is idempotent: calling it more than once is a no-op (logged as a
+// warning), since the first call's sampling goroutine keeps running.
 type Guard struct {
 	usedBytes        atomic.Int64
 	threshold        int64 // bytes = GOMEMLIMIT * thresholdPct / 100
@@ -108,15 +109,17 @@ func New(cfg Config) *Guard {
 // interval. The goroutine exits when ctx is canceled. If the Guard is
 // disabled, Start returns immediately without starting a goroutine.
 //
-// Start must be called at most once per Guard: calling it a second time
-// panics, since two sampling goroutines would race on the same internal
-// metrics.Sample slice.
+// Calling Start more than once on the same Guard is a no-op past the first
+// call: two sampling goroutines would race on the same internal
+// metrics.Sample slice, so the second (and any later) call logs a warning
+// and returns instead, leaving the original goroutine as the sole sampler.
 func (g *Guard) Start(ctx context.Context) {
 	if g.disabled {
 		return
 	}
 	if g.started.Swap(true) {
-		panic("memguard: Guard.Start called more than once")
+		log.Warn().Msg("[memguard] Guard.Start called more than once — ignoring, the first sampling goroutine is still running")
+		return
 	}
 	go func() {
 		ticker := time.NewTicker(g.samplingInterval)
