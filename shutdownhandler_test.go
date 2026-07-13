@@ -139,3 +139,19 @@ func TestShutdownHandlerExecute_Timeout(t *testing.T) {
 	err := sh.Execute(ctx)
 	assert.EqualError(t, err, fmt.Sprintf("shutdown handler '%s' failed: custom handler error on deadline exceeded", testFailedShutdownHandlerName))
 }
+
+func TestShutdownHandlerExecute_InvalidPolicyFallsBackToWarn(t *testing.T) {
+	sh := &ShutdownHandler{
+		Name: testFailedShutdownHandlerName,
+		Handler: func(context.Context) error {
+			return errors.New("my error")
+		},
+		Policy: ErrorPolicy(99), // out of the defined enum range
+	}
+
+	var err error
+	assert.NotPanics(t, func() {
+		err = sh.Execute(context.Background())
+	}, "an invalid error policy should fall back to ErrorPolicyWarn, not panic")
+	assert.NoError(t, err, "ErrorPolicyWarn clears the error so the shutdown sequence can continue")
+}

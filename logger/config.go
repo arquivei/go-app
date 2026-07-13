@@ -32,7 +32,7 @@ func Setup(config Config, version string, extraLogWriters ...io.Writer) {
 		log.Logger = log.Output(zerolog.MultiLevelWriter(extraLogWriters...))
 	}
 
-	zerolog.SetGlobalLevel(MustParseLevel(config.Level))
+	zerolog.SetGlobalLevel(parseLevelOrDefault(config.Level))
 
 	// Adds some global keys
 	log.Logger = log.With().
@@ -53,6 +53,20 @@ func MustParseLevel(l string) zerolog.Level {
 	zl, err := zerolog.ParseLevel(strings.ToLower(l))
 	if err != nil {
 		panic(err)
+	}
+
+	return zl
+}
+
+// parseLevelOrDefault is used by Setup instead of MustParseLevel: an invalid
+// Config.Level shouldn't crash the whole app at bootstrap when "info" is a
+// perfectly sane value to fall back to.
+func parseLevelOrDefault(l string) zerolog.Level {
+	zl, err := zerolog.ParseLevel(strings.ToLower(l))
+	if err != nil {
+		log.Warn().Str("configured_level", l).Err(err).
+			Msg("[logger] Invalid log level — falling back to info.")
+		return zerolog.InfoLevel
 	}
 
 	return zl
