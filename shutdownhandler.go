@@ -127,12 +127,7 @@ func (sh *ShutdownHandler) doExecute(ctx context.Context) {
 func (sh *ShutdownHandler) applyErrorPolicy() {
 	switch sh.Policy {
 	case ErrorPolicyWarn:
-		log.Warn().
-			Err(sh.err).
-			Str("handler", sh.Name).
-			Uint8("shutdown_priority", uint8(sh.Priority)).
-			Msg("[app] Shutdown handler failed but graceful shutdown will continue.")
-		sh.err = nil
+		sh.warnAndClearErr()
 	case ErrorPolicyAbort:
 		// No need for logging here, this will happen latter
 	case ErrorPolicyFatal:
@@ -147,8 +142,23 @@ func (sh *ShutdownHandler) applyErrorPolicy() {
 	case ErrorPolicyPanic:
 		panic(sh.err)
 	default:
-		panic(fmt.Errorf("invalid error policy: %v", sh.Policy))
+		// ErrorPolicyWarn is both the zero value and the documented default
+		// policy, so an out-of-range Policy falls back to it instead of panicking.
+		log.Warn().
+			Str("handler", sh.Name).
+			Int("invalid_policy", int(sh.Policy)).
+			Msg("[app] Invalid shutdown handler error policy — falling back to ErrorPolicyWarn.")
+		sh.warnAndClearErr()
 	}
+}
+
+func (sh *ShutdownHandler) warnAndClearErr() {
+	log.Warn().
+		Err(sh.err).
+		Str("handler", sh.Name).
+		Uint8("shutdown_priority", uint8(sh.Priority)).
+		Msg("[app] Shutdown handler failed but graceful shutdown will continue.")
+	sh.err = nil
 }
 
 // shutdownHeap is a heap implementation for the *shutdownHandler type

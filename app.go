@@ -251,10 +251,13 @@ func (app *App) shutdownAllHandlers(ctx context.Context) chan error {
 }
 
 // RunAndWait executes the main loop on a go-routine and listens to SIGINT and SIGKILL to start the shutdown.
-// This is expected to be called only once and will panic if called a second time.
+// Calling it more than once is a no-op past the first call: the second (and
+// any later) call logs a warning and returns immediately instead of running
+// a second main loop or shutdown sequence.
 func (app *App) RunAndWait(mainLoop MainLoopFunc) {
 	if alreadyRunning := app.isRunning.Swap(true); alreadyRunning {
-		panic("[app] RunAndWait called more than once")
+		log.Warn().Msg("[app] RunAndWait called more than once — ignoring, the app is already running")
+		return
 	}
 
 	log.Trace().Msg("[app] Starting run and wait.")
@@ -340,9 +343,15 @@ func (app *App) waitMainLoopFinish(timeout time.Duration) {
 // RegisterShutdownHandler adds a shutdown handler to the app. Shutdown Handlers are executed
 // one at a time from the highest priority to the lowest priority. Shutdown handlers of the same
 // priority are normally executed in the added order but this is not guaranteed.
+//
+// An empty sh.Name is replaced with an auto-generated one (logged as a
+// warning) instead of panicking, since handler names aren't required to be
+// unique here and a name can always be synthesized.
 func (app *App) RegisterShutdownHandler(sh *ShutdownHandler) {
 	if sh.Name == "" {
-		panic("shutdown handler name must not be an empty string")
+		sh.Name = fmt.Sprintf("unnamed-shutdown-handler-%d", app.shutdown.handlers.Len())
+		log.Warn().Str("shutdown_handler_name", sh.Name).
+			Msg("[app] Shutdown handler registered with an empty name — generated one instead.")
 	}
 	if len(app.shutdown.handlers) == 0 {
 		heap.Init(&app.shutdown.handlers)

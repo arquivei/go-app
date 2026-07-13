@@ -30,15 +30,16 @@ func newAppTestingConfig() Config {
 }
 
 func TestRunAndWait(t *testing.T) {
-	assert.Panics(t, func() {
-		a := App{}
+	assert.NotPanics(t, func() {
+		cfg := newAppTestingConfig()
+		cfg.App.Shutdown.GracePeriod = 0
+		a := New(cfg)
 		main := func(ctx context.Context) error {
-			<-ctx.Done()
-			return ctx.Err()
+			return nil
 		}
 		a.RunAndWait(main)
-		a.RunAndWait(main)
-	}, "Panics if RunAndWait is called more than once.")
+		a.RunAndWait(main) // a second call should be a no-op, not a panic
+	}, "Calling RunAndWait a second time should be a no-op, not panic.")
 
 	assert.NotPanics(t, func() {
 		a := New(newAppTestingConfig())
@@ -63,6 +64,22 @@ func TestAppShutdown(t *testing.T) {
 		assert.NoError(t, err, "Shutdown should not fail.")
 		assert.True(t, shutdownHandlerCalled, "Shutdown handler should be executed during shutdown.")
 	}, "Calling RunAndWait once should not Panic")
+}
+
+func TestRegisterShutdownHandler_EmptyNameGetsGenerated(t *testing.T) {
+	a := New(Config{})
+
+	sh := &ShutdownHandler{
+		Handler: func(ctx context.Context) error { return nil },
+	}
+
+	assert.NotPanics(t, func() {
+		a.RegisterShutdownHandler(sh)
+	}, "an empty handler name should be replaced with a generated one, not panic")
+	assert.NotEmpty(t, sh.Name, "RegisterShutdownHandler should have generated a name")
+
+	err := a.Shutdown(context.Background())
+	assert.NoError(t, err, "the auto-named handler should still execute normally during shutdown")
 }
 
 // withGoMemLimit temporarily overrides the process's GOMEMLIMIT for the
