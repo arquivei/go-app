@@ -4,11 +4,14 @@ import (
 	"container/heap"
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 )
+
+const testFailedShutdownHandlerName = "my_failed_shutdown_handler"
 
 func TestShutdownhandlerHeap(t *testing.T) {
 	h := shutdownHeap{}
@@ -83,7 +86,7 @@ func TestShutdownHandlerExecute(t *testing.T) {
 	assert.NoError(t, sh.err)
 
 	sh = &ShutdownHandler{
-		Name: "my_failed_shutdown_handler",
+		Name: testFailedShutdownHandlerName,
 		Handler: func(context.Context) error {
 			return errors.New("my error")
 		},
@@ -91,7 +94,7 @@ func TestShutdownHandlerExecute(t *testing.T) {
 	}
 
 	err = sh.Execute(context.TODO())
-	assert.EqualError(t, err, "shutdown handler 'my_failed_shutdown_handler' failed: my error")
+	assert.EqualError(t, err, fmt.Sprintf("shutdown handler '%s' failed: my error", testFailedShutdownHandlerName))
 
 	err2 := sh.Execute(context.TODO())
 	assert.Equal(t, err, err2, "a second execution of handler should return the first error")
@@ -102,7 +105,7 @@ func TestShutdownHandlerExecute_CanceledContext(t *testing.T) {
 	cancel()
 
 	sh := &ShutdownHandler{
-		Name: "my_failed_shutdown_handler",
+		Name: testFailedShutdownHandlerName,
 		Handler: func(context.Context) error {
 			return errors.New("my error")
 		},
@@ -111,12 +114,12 @@ func TestShutdownHandlerExecute_CanceledContext(t *testing.T) {
 
 	err := sh.Execute(ctx)
 
-	assert.EqualError(t, err, "shutdown handler 'my_failed_shutdown_handler' failed: context canceled")
+	assert.EqualError(t, err, fmt.Sprintf("shutdown handler '%s' failed: context canceled", testFailedShutdownHandlerName))
 }
 
 func TestShutdownHandlerExecute_Timeout(t *testing.T) {
 	sh := &ShutdownHandler{
-		Name: "my_failed_shutdown_handler",
+		Name: testFailedShutdownHandlerName,
 		Handler: func(ctx context.Context) error {
 			// We will simulate a long-running operation that exceeds the timeout
 			// Reading from a nil channel will block indefinitely
@@ -134,5 +137,5 @@ func TestShutdownHandlerExecute_Timeout(t *testing.T) {
 
 	ctx := context.Background()
 	err := sh.Execute(ctx)
-	assert.EqualError(t, err, "shutdown handler 'my_failed_shutdown_handler' failed: custom handler error on deadline exceeded")
+	assert.EqualError(t, err, fmt.Sprintf("shutdown handler '%s' failed: custom handler error on deadline exceeded", testFailedShutdownHandlerName))
 }

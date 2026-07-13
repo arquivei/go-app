@@ -14,22 +14,22 @@ import (
 func TestFiles(t *testing.T) {
 	expect := f.Config{
 		Anon: f.Anon{
-			Version: "0.2",
+			Version: testConfigVersion,
 		},
 
 		GoHard: true,
 
 		Redis: f.Redis{
-			Host: "redis-host",
+			Host: testConfigRedisHost,
 			Port: 6379,
 		},
 
 		Rethink: f.RethinkConfig{
 			Host: f.Host{
-				Address: "rethink-cluster",
+				Address: testConfigRethinkHost,
 				Port:    "28015",
 			},
-			DB: "base",
+			DB: testConfigDB,
 		},
 	}
 

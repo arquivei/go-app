@@ -87,20 +87,31 @@ func RegisterShutdownHandler(sh *ShutdownHandler) {
 	defaultApp.RegisterShutdownHandler(sh)
 }
 
-// ReadinessProbeGoup is a collection of readiness probes.
-func ReadinessProbeGoup() *ProbeGroup {
+// ReadinessProbeGroup is a collection of readiness probes.
+func ReadinessProbeGroup() *ProbeGroup {
 	if defaultApp == nil {
 		panic("default app not initialized")
 	}
 	return &defaultApp.Ready
 }
 
-// HealthinessProbeGroup is a colection of healthiness probes.
+// HealthinessProbeGroup is a collection of healthiness probes.
 func HealthinessProbeGroup() *ProbeGroup {
 	if defaultApp == nil {
 		panic("default app not initialized")
 	}
 	return &defaultApp.Healthy
+}
+
+// IsOverloaded returns true when process memory usage has reached the
+// configured threshold of GOMEMLIMIT. Always returns false when MemGuard is
+// disabled or GOMEMLIMIT is not configured. Useful for building middleware
+// that sheds load under memory pressure.
+func IsOverloaded() bool {
+	if defaultApp == nil {
+		panic("default app not initialized")
+	}
+	return defaultApp.IsOverloaded()
 }
 
 func shouldCheckProbeInsteadOfCreatingApp(cfg Config) bool {

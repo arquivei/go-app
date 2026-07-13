@@ -16,6 +16,8 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog/log"
+
+	"github.com/arquivei/go-app/pkg/memguard"
 )
 
 // MainLoopFunc is the function runned by app. If it finishes, it will trigger a shutdown.
@@ -32,6 +34,8 @@ type App struct {
 
 	readinessProbe   Probe
 	healthinessProbe Probe
+
+	overloadGuard *memguard.Guard
 
 	isRunning atomic.Bool
 	shutdown  struct {
@@ -67,13 +71,87 @@ func New(c Config) *App {
 			gracePeriod: c.App.Shutdown.GracePeriod,
 			timeout:     c.App.Shutdown.Timeout,
 		},
-		readinessProbe:   readinessProbeGroup.MustNewProbe("fkit/app", false),
-		healthinessProbe: healthinessProbeGroup.MustNewProbe("fkit/app", true),
+		readinessProbe:   readinessProbeGroup.MustNewProbe("go-app/app", false),
+		healthinessProbe: healthinessProbeGroup.MustNewProbe("go-app/app", true),
 	}
 
+	app.startMemGuard(c)
 	app.startAdminServer(c)
 
 	return app
+}
+
+// startMemGuard bootstraps automatic memory-overload protection: it tracks
+// process memory usage against GOMEMLIMIT and, per c.App.MemGuard.Affects,
+// wires the result into app.Ready and/or app.Healthy. App.IsOverloaded keeps
+// reflecting real sampling regardless of whether any probe is wired,
+// following memguard.Guard's own contract — this lets middleware depend on
+// App.IsOverloaded without requiring either probe to be enabled.
+//
+// A single goroutine drives both sampling and probe updates (via
+// guard.Sample, not guard.Start) so there's only one ticker per App instead
+// of one for sampling and another for polling IsOverloaded. It exits with
+// app.mainLoopCtx; there is no separate Stop, since the app's own shutdown
+// sequence already cancels that context.
+func (app *App) startMemGuard(c Config) {
+	cfg := c.App.MemGuard
+	if !cfg.Enabled {
+		return
+	}
+
+	guard := memguard.New(memguard.Config{
+		ThresholdPct:     cfg.ThresholdPct,
+		SamplingInterval: cfg.SamplingInterval,
+	})
+	app.overloadGuard = guard
+
+	if guard.Disabled() {
+		return
+	}
+
+	var readinessProbe, healthinessProbe Probe
+	if cfg.Affects.Readiness {
+		readinessProbe = app.Ready.MustNewProbe("memory-pressure", true)
+	}
+	if cfg.Affects.Liveness {
+		healthinessProbe = app.Healthy.MustNewProbe("memory-pressure", true)
+	}
+
+	go func() {
+		ticker := time.NewTicker(guard.SamplingInterval())
+		defer ticker.Stop()
+
+		sampleAndUpdateProbes := func() {
+			guard.Sample()
+			ok := !guard.IsOverloaded()
+			if cfg.Affects.Readiness {
+				readinessProbe.Set(ok)
+			}
+			if cfg.Affects.Liveness {
+				healthinessProbe.Set(ok)
+			}
+		}
+
+		sampleAndUpdateProbes()
+		for {
+			select {
+			case <-app.mainLoopCtx.Done():
+				return
+			case <-ticker.C:
+				sampleAndUpdateProbes()
+			}
+		}
+	}()
+}
+
+// IsOverloaded returns true when process memory usage has reached the
+// configured threshold of GOMEMLIMIT. Always returns false when MemGuard is
+// disabled (c.App.MemGuard.Enabled=false) or GOMEMLIMIT is not configured.
+func (app *App) IsOverloaded() bool {
+	if app.overloadGuard == nil {
+		return false
+	}
+	return app.overloadGuard.IsOverloaded()
 }
 
 func (app *App) startAdminServer(c Config) {

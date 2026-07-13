@@ -96,7 +96,7 @@ func walkStruct(prefix string, rs reflect.Value) ([]Field, error) {
 func unwrap(s interface{}) (reflect.Value, error) {
 	rs := reflect.ValueOf(s)
 
-	if k := rs.Kind(); k != reflect.Ptr {
+	if k := rs.Kind(); k != reflect.Pointer {
 		return rs, ErrUnexpectedType
 	}
 

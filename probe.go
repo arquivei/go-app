@@ -6,40 +6,41 @@ import (
 	"regexp"
 	"strings"
 	"sync"
+	"sync/atomic"
 
 	"github.com/rs/zerolog/log"
 )
 
 // Probe stores the state of a probe (`true` or `false` for ok and not ok respectively).
 type Probe struct {
-	ok *bool
+	ok *atomic.Bool
 }
 
 // Set changes the state of a probe. Use `true` for ok and `false` for not ok.
 func (p *Probe) Set(ok bool) {
-	*p.ok = ok
+	p.ok.Store(ok)
 }
 
 // SetOk sets the probe as ok. Same as `Set(true)`.
 func (p *Probe) SetOk() {
-	*p.ok = true
+	p.ok.Store(true)
 }
 
 // SetNotOk sets the probe as not ok. Same as `Set(false)`.
 func (p *Probe) SetNotOk() {
-	*p.ok = false
+	p.ok.Store(false)
 }
 
 // IsOk returns the state of the probe  (`true` or `false` for ok and not ok respectively).
 func (p *Probe) IsOk() bool {
-	return *p.ok
+	return p.ok.Load()
 }
 
 // ProbeGroup aggregates and manages probes. Probes inside a group must have a unique name.
 type ProbeGroup struct {
 	name   string
 	lock   *sync.RWMutex
-	probes map[string]*bool
+	probes map[string]*atomic.Bool
 }
 
 // NewProbeGroup returns a new ProbeGroup.
@@ -47,7 +48,7 @@ func NewProbeGroup(name string) ProbeGroup {
 	return ProbeGroup{
 		name:   name,
 		lock:   &sync.RWMutex{},
-		probes: make(map[string]*bool),
+		probes: make(map[string]*atomic.Bool),
 	}
 }
 
@@ -77,9 +78,11 @@ func (g *ProbeGroup) checkProbeAlreadyExists(name string) error {
 }
 
 func (g *ProbeGroup) newProbe(name string, ok bool) Probe {
-	g.probes[name] = &ok
+	b := &atomic.Bool{}
+	b.Store(ok)
+	g.probes[name] = b
 
-	return Probe{&ok}
+	return Probe{b}
 }
 
 // MustNewProbe returns a new Probe with the given name and panics in case of error.
@@ -132,7 +135,7 @@ func (g *ProbeGroup) CheckProbes() (bool, string) {
 
 	ok := true
 	for name, probeOk := range g.probes {
-		if !*probeOk {
+		if !probeOk.Load() {
 			if !ok { // There is already a probe that is not ok
 				cause.WriteString(",")
 			}
