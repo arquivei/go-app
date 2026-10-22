@@ -64,6 +64,7 @@ CI (`.github/workflows/go.yml`) runs in parallel: `build`, `test` (with `-race`)
 - **Linting**: code must pass `golangci-lint run` (config in `.golangci.yml`) before submitting. Enabled linters include `bodyclose`, `dupl`, `errcheck`, `copyloopvar`, `goconst`, `gocritic`, `gocyclo`, `gosec`, `govet`, `ineffassign`, `misspell`, `nakedret`, `noctx`, `prealloc`, `rowserrcheck`, `staticcheck`, `unconvert`, `unparam`, `unused`, `whitespace`. Don't use hacks to bypass linters unless explicitly necessary.
 - **Tests**: use `stretchr/testify` for assertions. Always add or update tests when changing behavior. Test files follow the `_test.go` pattern next to the code under test.
 - **Logging**: prefer structured logging. The application standardizes logs in JSON or human-readable format via configuration (`APP_LOG_HUMAN`).
+- **Secrets**: `logger.Flatten` (used to log the config on boot) masks string fields with sensitive name suffixes and redacts URL credentials; `secret:"true"`/`secret:"false"` override it. Rules in `docs/secrets.md` — keep both in sync.
 - **Configuration**: config fields use `default` and `usage` tags (e.g. `pkg/memguard/memguard.go`), which automatically feed flags, env vars, and help (`-h`).
 - **Examples first**: before implementing new features, check `examples/` (`panic`, `probes`, `quickstart`, `servefiles`, `shutdown-handlers`, `slog`) to align with existing patterns.
 - **Minimal dependencies**: minimize external dependencies; prefer libraries already present in `go.mod` (`zerolog`, `prometheus/client_golang`, `echo/v4`, `testify`).

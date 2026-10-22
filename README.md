@@ -77,6 +77,8 @@ Version can be overwritten in compile time using `-ldflags`:
 -ldflags="-X main.version=v0.0.1"
 ```
 
+The configuration is logged on boot with secrets masked: fields whose names look like secrets (`APIKey`, `DBPassword`, ...) and credentials inside URLs are hidden automatically, and the `secret:"true"` / `secret:"false"` tags override that. See [docs/secrets.md](docs/secrets.md).
+
 More information on the [presentation](docs/presentation.slide) slides.
 
 Use the [present](https://pkg.go.dev/golang.org/x/tools/present) tool to render the slides or you can check it online at https://go-talks.appspot.com/github.com/arquivei/go-app/docs/presentation.slide

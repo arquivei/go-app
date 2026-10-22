@@ -48,8 +48,7 @@ func TestFlatten(t *testing.T) {
 		FooE1: "5",
 		FooE2: "q1w2e3",
 	}
-	expectedFlattenE := `FooE1: '5'`
-	assert.Equal(t, expectedFlattenE, Flatten(structE), "test failed for struct E")
+	assert.Equal(t, map[string]any{"FooE1": "5", "FooE2": maskedValue}, flattenPrefixed(structE, ""), "test failed for struct E")
 
 	assert.NotPanics(t, func() {
 		Flatten(nil)
