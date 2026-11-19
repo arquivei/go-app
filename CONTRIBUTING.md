@@ -1,57 +1,44 @@
 # Contributing
 
-## Issues
+Use issues to report problems, suggest improvements, or ask questions about
+the library. In pull requests, explain the problem, the public behavior
+affected, and how you verified the change. Keep changes focused on common
+service and worker needs, including configuration, logging, metrics, and
+lifecycle management.
 
-Issues are very valuable to this project.
+## Run checks
 
-- Ideas are a valuable source of contributions others can make
-- Problems show where this project is lacking
-- With a question you show where contributors can improve the user
-  experience
+The module requires Go 1.26.0 or later. From the repository root, run these
+checks with Go and golangci-lint installed.
 
-Thank you for creating them.
+```sh
+go vet ./...
+go build ./...
+go test ./...
+go test -v -race ./...
+golangci-lint run
+```
 
-## Pull Requests
+With Task installed, `task checks` runs vet, build, tests, and lint. Run the
+race tests separately. CI uses Go 1.27 for build, vet, and race tests.
 
-Pull requests are, a great way to get your ideas into this repository.
+## Update documentation and examples
 
-When deciding if we merge in a pull request we look at the following
-things:
+Write documentation, code comments, configuration help, logs, and test
+messages in English. Update the [guides](README.md#guides-and-examples),
+package Godoc, and [runnable examples](examples/) when relevant behavior
+changes. Keep examples in `example_test.go` deterministic so `go test ./...`
+can verify their output. If you change code featured in the
+[presentation](docs/presentation.slide), check that its code references still
+show the intended snippets.
 
-### Does it state intent
+When configuration fields, tags, or help output change, regenerate the
+[configuration reference](docs/configuration-reference.md) from the repository
+root. Include the generated diff in the pull request.
 
-You should be clear which problem you're trying to solve with your
-contribution.
+```sh
+task docs:generate
+```
 
-For example:
-
-> Add link to code of conduct in README.md
-
-Doesn't tell us anything about why you're doing that.
-
-> Add link to code of conduct in README.md because users don't always
-> look in the CONTRIBUTING.md
-
-Tells us the problem that you have found, and the pull request shows us
-the action you have taken to solve it.
-
-### Is it of good quality
-
-- There are no spelling mistakes
-- It reads well
-- For English language contributions: Has a good score on
-  [Grammarly](https://www.grammarly.com) or [Hemingway
-  App](https://www.hemingwayapp.com/)
-
-### Does it move this repository closer to our vision for the repository
-
-The aim of this repository is:
-
-- Provide packages for commom basic necessities, like logging, metrics, etc;
-- A standard single way of doing things;
-- Facilitate the developing, deploying and maintenance of APIs and Workers;
-
-### Does it follow the contributor covenant
-
-This repository has a [code of conduct](CODE_OF_CONDUCT.md), we will
-remove things that do not respect it.
+Follow the [code of conduct](CODE_OF_CONDUCT.md) in project discussions and
+contributions.

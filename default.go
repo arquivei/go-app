@@ -24,7 +24,7 @@ type AppConfig interface {
 	GetAppConfig() Config
 }
 
-// Bootstrap initializes the config structure, the log and creates a new app internally.
+// Bootstrap loads configuration, configures the global logger, and creates the default app.
 func Bootstrap(appVersion string, config AppConfig) {
 	SetupConfig(config)
 	appConfig := config.GetAppConfig()
@@ -40,8 +40,10 @@ func Bootstrap(appVersion string, config AppConfig) {
 	defaultApp = New(appConfig)
 }
 
-// RunAndWait executes the main loop on a go-routine and listens to SIGINT and SIGKILL to start the shutdown.
-// This is expected to be called only once and will panic if called a second time.
+// RunAndWait runs the default app until the main loop returns or the process
+// receives SIGINT or SIGTERM, then performs graceful shutdown.
+// It panics if called before [Bootstrap]. Subsequent calls on the same app
+// log a warning and return immediately.
 func RunAndWait[T func() | func() error | func(context.Context) | func(context.Context) error](f T) {
 	if defaultApp == nil {
 		panic("default app not initialized")
@@ -87,7 +89,7 @@ func RegisterShutdownHandler(sh *ShutdownHandler) {
 	defaultApp.RegisterShutdownHandler(sh)
 }
 
-// ReadinessProbeGroup is a collection of readiness probes.
+// ReadinessProbeGroup returns the default app's readiness probes.
 func ReadinessProbeGroup() *ProbeGroup {
 	if defaultApp == nil {
 		panic("default app not initialized")
@@ -95,7 +97,7 @@ func ReadinessProbeGroup() *ProbeGroup {
 	return &defaultApp.Ready
 }
 
-// HealthinessProbeGroup is a collection of healthiness probes.
+// HealthinessProbeGroup returns the default app's liveness probes.
 func HealthinessProbeGroup() *ProbeGroup {
 	if defaultApp == nil {
 		panic("default app not initialized")

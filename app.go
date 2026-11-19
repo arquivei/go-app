@@ -20,11 +20,11 @@ import (
 	"github.com/arquivei/go-app/pkg/memguard"
 )
 
-// MainLoopFunc is the function runned by app. If it finishes, it will trigger a shutdown.
-// The context will be canceled when application is gracefully shutting down.
+// MainLoopFunc runs the application. Returning initiates graceful shutdown.
+// [App.Shutdown] cancels the context passed to the function.
 type MainLoopFunc func(context.Context) error
 
-// App represents an application with a main loop and a shutdown routine
+// App represents an application with a main loop and a shutdown routine.
 type App struct {
 	Ready   ProbeGroup
 	Healthy ProbeGroup
@@ -47,7 +47,8 @@ type App struct {
 	}
 }
 
-// New returns a new App using the app.Config struct for configuration.
+// New creates an App using the supplied configuration as-is. Call [SetupConfig]
+// before New to apply struct tag defaults, environment variables, and flags.
 func New(c Config) *App {
 	log.Trace().Msg("[app] Creating new app")
 
@@ -188,8 +189,8 @@ func (app *App) startAdminServer(c Config) {
 	}()
 }
 
-// Shutdown calls all shutdown methods ordered by priority.
-// Handlers are processed from higher priority to lower priority.
+// Shutdown cancels the main-loop context and runs handlers from highest to
+// lowest priority. Subsequent calls return the result of the first call.
 func (app *App) Shutdown(ctx context.Context) error {
 	app.shutdown.once.Do(func() {
 		log.Trace().Int("shutdown_handlers", app.shutdown.handlers.Len()).Msg("[app] Starting graceful shutdown.")
@@ -250,10 +251,10 @@ func (app *App) shutdownAllHandlers(ctx context.Context) chan error {
 	return done
 }
 
-// RunAndWait executes the main loop on a go-routine and listens to SIGINT and SIGKILL to start the shutdown.
-// Calling it more than once is a no-op past the first call: the second (and
-// any later) call logs a warning and returns immediately instead of running
-// a second main loop or shutdown sequence.
+// RunAndWait starts the main loop in a goroutine and begins graceful shutdown
+// when the loop returns or the process receives SIGINT or SIGTERM.
+// It marks readiness as failing and waits the configured grace period before
+// calling [App.Shutdown]. Subsequent calls log a warning and return immediately.
 func (app *App) RunAndWait(mainLoop MainLoopFunc) {
 	if alreadyRunning := app.isRunning.Swap(true); alreadyRunning {
 		log.Warn().Msg("[app] RunAndWait called more than once — ignoring, the app is already running")

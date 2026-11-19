@@ -20,7 +20,8 @@ type ShutdownPriority uint8
 const (
 	// ErrorPolicyWarn prints the error as a warning and continues to the next handler. This is the default.
 	ErrorPolicyWarn ErrorPolicy = iota
-	// ErrorPolicyAbort stops the shutdown process and returns an error
+	// ErrorPolicyAbort reports the handler error to Shutdown. Later handlers may
+	// still run while the shutdown context remains active.
 	ErrorPolicyAbort
 	// ErrorPolicyFatal logs the error as Fatal, it means the application will close immediately
 	ErrorPolicyFatal
@@ -88,7 +89,8 @@ type ShutdownHandler struct {
 	once  sync.Once
 }
 
-// Execute runs the shutdown functions and handles timeout and error policy
+// Execute runs the handler at most once and returns the stored result.
+// A positive Timeout sets a context deadline, which the handler must observe.
 func (sh *ShutdownHandler) Execute(ctx context.Context) error {
 	sh.once.Do(func() {
 		sh.doExecute(ctx)
