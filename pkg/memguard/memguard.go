@@ -1,5 +1,5 @@
-// Package memguard provides memory protection for the HTTP server,
-// returning HTTP 429 when memory usage exceeds a configured threshold.
+// Package memguard monitors Go runtime memory usage and signals overload when
+// usage reaches a configured percentage of the runtime memory limit.
 package memguard
 
 import (

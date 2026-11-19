@@ -7,3 +7,8 @@ tasks:
       - go build ./...
       - go test ./...
       - golangci-lint run
+
+  docs:generate:
+    desc: Generate the default configuration reference
+    cmds:
+      - ./scripts/generate-config-docs.sh
